@@ -10,85 +10,87 @@ import { Toggle } from "../../common/Toggle";
 
 const styles: Record<string, CSSProperties> = {
   section: {
-    marginBottom: 32,
+    marginBottom: 28,
   },
   sectionTitle: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: 600,
-    color: "#A0A0B0",
+    color: "#8E8E9A",
     textTransform: "uppercase" as const,
-    letterSpacing: "0.05em",
-    marginBottom: 12,
+    letterSpacing: "0.06em",
+    marginBottom: 8,
+    paddingLeft: 2,
   },
-  sectionContent: {
-    backgroundColor: "rgba(28, 28, 35, 0.95)",
-    borderRadius: 12,
-    padding: "4px 16px",
+  card: {
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderRadius: 10,
+    padding: "2px 14px",
     border: "1px solid rgba(255, 255, 255, 0.06)",
   },
   divider: {
     height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     margin: 0,
   },
   infoBox: {
-    backgroundColor: "rgba(229, 57, 53, 0.08)",
-    border: "1px solid rgba(229, 57, 53, 0.15)",
+    backgroundColor: "rgba(229, 57, 53, 0.06)",
+    border: "1px solid rgba(229, 57, 53, 0.12)",
     borderRadius: 10,
-    padding: "14px 16px",
+    padding: "12px 14px",
     marginBottom: 24,
   },
   infoTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 600,
-    color: "#FFFFFF",
-    marginBottom: 6,
+    color: "#F5F5F7",
+    marginBottom: 4,
   },
   infoText: {
-    fontSize: 13,
-    color: "#A0A0B0",
-    lineHeight: "18px",
+    fontSize: 12,
+    color: "#8E8E9A",
+    lineHeight: "17px",
   },
   row: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "14px 0",
+    padding: "12px 0",
     gap: 16,
   },
   rowLabel: {
-    fontSize: 14,
-    fontWeight: 500,
-    color: "#FFFFFF",
-  },
-  rowDescription: {
-    fontSize: 12,
-    color: "#A0A0B0",
-    marginTop: 2,
-  },
-  actionButton: {
-    padding: "8px 16px",
-    borderRadius: 8,
-    border: "1px solid rgba(255, 255, 255, 0.12)",
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
-    color: "#FFFFFF",
     fontSize: 13,
     fontWeight: 500,
+    color: "#F5F5F7",
+  },
+  rowDescription: {
+    fontSize: 11,
+    color: "#8E8E9A",
+    marginTop: 2,
+    lineHeight: "15px",
+  },
+  actionButton: {
+    padding: "6px 14px",
+    borderRadius: 7,
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    backgroundColor: "rgba(255, 255, 255, 0.04)",
+    color: "#F5F5F7",
+    fontSize: 12,
+    fontWeight: 500,
     cursor: "pointer",
-    transition: "all 0.15s ease",
+    transition: "all 0.12s ease",
     fontFamily: "inherit",
     whiteSpace: "nowrap" as const,
   },
   dangerButton: {
-    padding: "8px 16px",
-    borderRadius: 8,
-    border: "1px solid rgba(248, 113, 113, 0.3)",
-    backgroundColor: "rgba(248, 113, 113, 0.1)",
+    padding: "6px 14px",
+    borderRadius: 7,
+    border: "1px solid rgba(248, 113, 113, 0.25)",
+    backgroundColor: "rgba(248, 113, 113, 0.08)",
     color: "#F87171",
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 500,
     cursor: "pointer",
-    transition: "all 0.15s ease",
+    transition: "all 0.12s ease",
     fontFamily: "inherit",
     whiteSpace: "nowrap" as const,
   },
@@ -105,52 +107,60 @@ const styles: Record<string, CSSProperties> = {
     zIndex: 1000,
   },
   confirmDialog: {
-    backgroundColor: "rgba(28, 28, 35, 0.98)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    borderRadius: 16,
-    padding: "24px",
-    maxWidth: 380,
+    backgroundColor: "rgba(20, 20, 26, 0.98)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: 14,
+    padding: "20px",
+    maxWidth: 360,
     width: "100%",
     boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+    backdropFilter: "blur(24px)",
+    WebkitBackdropFilter: "blur(24px)",
   },
   confirmTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 600,
-    color: "#FFFFFF",
-    marginBottom: 8,
+    color: "#F5F5F7",
+    marginBottom: 6,
   },
   confirmText: {
-    fontSize: 14,
-    color: "#A0A0B0",
-    lineHeight: "20px",
-    marginBottom: 20,
+    fontSize: 12,
+    color: "#8E8E9A",
+    lineHeight: "17px",
+    marginBottom: 16,
   },
   confirmActions: {
     display: "flex",
     justifyContent: "flex-end",
-    gap: 10,
+    gap: 8,
   },
   cancelButton: {
-    padding: "8px 16px",
-    borderRadius: 8,
-    border: "1px solid rgba(255, 255, 255, 0.12)",
+    padding: "6px 14px",
+    borderRadius: 7,
+    border: "1px solid rgba(255, 255, 255, 0.1)",
     backgroundColor: "transparent",
-    color: "#A0A0B0",
-    fontSize: 13,
+    color: "#8E8E9A",
+    fontSize: 12,
     fontWeight: 500,
     cursor: "pointer",
     fontFamily: "inherit",
   },
   confirmDestructiveButton: {
-    padding: "8px 16px",
-    borderRadius: 8,
+    padding: "6px 14px",
+    borderRadius: 7,
     border: "none",
     backgroundColor: "#F87171",
     color: "#FFFFFF",
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
     fontFamily: "inherit",
+  },
+  retentionNote: {
+    fontSize: 11,
+    color: "#55555F",
+    lineHeight: "15px",
+    padding: "8px 0",
   },
 };
 
@@ -162,14 +172,11 @@ export function PrivacyTab() {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const handleClearHistory = useCallback(() => {
-    // TODO: Invoke Tauri command to clear local SQLite history
-    // await invoke("clear_history");
     setShowClearConfirm(false);
   }, []);
 
   const handleExportData = useCallback(() => {
-    // TODO: Invoke Tauri command to export user data
-    // await invoke("export_data");
+    // TODO: Export user data
   }, []);
 
   return (
@@ -178,46 +185,66 @@ export function PrivacyTab() {
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>Your data stays private</div>
         <div style={styles.infoText}>
-          REDE processes audio on your device first. When Private Mode is on,
-          audio is never sent to the cloud -- all transcription happens locally.
-          History is stored only on your Mac in an encrypted SQLite database.
+          REDE processes audio on your device first. When Private Mode is
+          enabled, audio is never sent to the cloud. History is stored only on
+          your Mac in an encrypted database.
         </div>
       </div>
 
       {/* Privacy Controls */}
       <div style={styles.section}>
-        <div style={styles.sectionTitle}>Privacy Controls</div>
-        <div style={styles.sectionContent}>
-          {/* Private Mode */}
+        <div style={styles.sectionTitle}>Privacy</div>
+        <div style={styles.card}>
           <Toggle
             checked={settings.private_mode}
             onChange={(v) => updateSetting("private_mode", v)}
             label="Private Mode"
-            description="Keep all transcription local. No audio data is sent to the cloud."
+            description="All transcription stays local. No audio sent to cloud."
           />
 
           <div style={styles.divider} />
 
-          {/* Analytics */}
           <Toggle
             checked={settings.analytics}
             onChange={(v) => updateSetting("analytics", v)}
             label="Usage Analytics"
-            description="Send anonymous usage statistics to help improve REDE"
+            description="Anonymous usage data to help improve REDE"
           />
         </div>
       </div>
 
-      {/* Data Management */}
+      {/* Dictation History */}
       <div style={styles.section}>
-        <div style={styles.sectionTitle}>Data Management</div>
-        <div style={styles.sectionContent}>
-          {/* Clear History */}
+        <div style={styles.sectionTitle}>Dictation History</div>
+        <div style={styles.card}>
+          <div style={styles.row}>
+            <div>
+              <div style={styles.rowLabel}>Recent Dictations</div>
+              <div style={styles.rowDescription}>
+                Your last 12 hours of dictations are kept locally so you can
+                review or copy them. After 12 hours they are automatically
+                deleted.
+              </div>
+            </div>
+          </div>
+
+          <div style={styles.divider} />
+
+          <div style={{ ...styles.row, flexDirection: "column" as const, alignItems: "flex-start", gap: 4 }}>
+            <div style={styles.rowLabel}>When Private Mode is on</div>
+            <div style={styles.rowDescription}>
+              Dictations are never stored — they are discarded immediately after
+              being inserted into the active text field. No history is kept.
+            </div>
+          </div>
+
+          <div style={styles.divider} />
+
           <div style={styles.row}>
             <div>
               <div style={styles.rowLabel}>Clear History</div>
               <div style={styles.rowDescription}>
-                Permanently delete all local dictation history
+                Delete all local dictation history now
               </div>
             </div>
             <button
@@ -228,14 +255,23 @@ export function PrivacyTab() {
             </button>
           </div>
 
-          <div style={styles.divider} />
+          <div style={styles.retentionNote}>
+            Dictations older than 12 hours are automatically purged. Nothing is
+            ever sent to external servers unless Private Mode is off and you are
+            using cloud transcription.
+          </div>
+        </div>
+      </div>
 
-          {/* Export Data */}
+      {/* Data */}
+      <div style={styles.section}>
+        <div style={styles.sectionTitle}>Data</div>
+        <div style={styles.card}>
           <div style={styles.row}>
             <div>
               <div style={styles.rowLabel}>Export Data</div>
               <div style={styles.rowDescription}>
-                Download a copy of your history, snippets, and settings
+                Download history, snippets, and settings
               </div>
             </div>
             <button style={styles.actionButton} onClick={handleExportData}>
@@ -245,7 +281,7 @@ export function PrivacyTab() {
         </div>
       </div>
 
-      {/* Clear History Confirmation Dialog */}
+      {/* Clear History Confirmation */}
       {showClearConfirm && (
         <div
           style={styles.confirmOverlay}

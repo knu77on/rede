@@ -1,10 +1,9 @@
 // ============================================================
 // REDE - Settings Window
-// macOS System Settings–inspired layout with top toolbar tabs
+// macOS System Settings–inspired layout with centered toolbar
 // ============================================================
 
 import { type CSSProperties, useState, useCallback } from "react";
-import { useSettingsStore } from "../../stores/settingsStore";
 import { GeneralTab } from "./tabs/GeneralTab";
 import { VoiceTab } from "./tabs/VoiceTab";
 import { ProcessingTab } from "./tabs/ProcessingTab";
@@ -43,11 +42,11 @@ const windowStyle: CSSProperties = {
   overflow: "hidden",
 };
 
-// Toolbar — thin bar at the top, macOS style
+// Toolbar — tab bar aligned with content column
 const toolbarStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
-  justifyContent: "space-between",
+  justifyContent: "center",
   padding: "0 24px",
   height: 52,
   minHeight: 52,
@@ -56,6 +55,15 @@ const toolbarStyle: CSSProperties = {
   backdropFilter: "blur(20px)",
   WebkitBackdropFilter: "blur(20px)",
   userSelect: "none",
+};
+
+// Inner container matches content max-width for alignment
+const toolbarInnerStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  width: "100%",
+  maxWidth: 560,
 };
 
 const toolbarTitleStyle: CSSProperties = {
@@ -98,7 +106,6 @@ const tabHoverStyle: CSSProperties = {
   color: "#CCCCD0",
 };
 
-// Content area
 const contentStyle: CSSProperties = {
   flex: 1,
   overflow: "auto",
@@ -112,45 +119,11 @@ const contentInnerStyle: CSSProperties = {
   padding: "28px 32px 48px",
 };
 
-// Save bar
-const saveBarStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  padding: "0 24px",
-  height: 44,
-  minHeight: 44,
-  borderTop: "1px solid rgba(255, 255, 255, 0.06)",
-  backgroundColor: "rgba(14, 14, 18, 0.95)",
-  justifyContent: "flex-end",
-};
-
-const saveButtonStyle: CSSProperties = {
-  padding: "6px 16px",
-  borderRadius: 6,
-  border: "none",
-  backgroundColor: "#E53935",
-  color: "#FFFFFF",
-  fontSize: 12,
-  fontWeight: 600,
-  cursor: "pointer",
-  fontFamily: "inherit",
-  transition: "opacity 0.12s ease",
-};
-
-const versionStyle: CSSProperties = {
-  fontSize: 10,
-  color: "#55555F",
-  marginRight: "auto",
-};
-
 // --- Component ---
 
 export function SettingsWindow() {
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [hoveredTab, setHoveredTab] = useState<TabId | null>(null);
-  const hasUnsavedChanges = useSettingsStore((s) => s.hasUnsavedChanges);
-  const saveSettings = useSettingsStore((s) => s.saveSettings);
 
   const handleTabClick = useCallback((tabId: TabId) => {
     setActiveTab(tabId);
@@ -175,29 +148,31 @@ export function SettingsWindow() {
 
   return (
     <div style={windowStyle}>
-      {/* Toolbar */}
+      {/* Toolbar — title and tabs aligned with content column */}
       <div style={toolbarStyle}>
-        <span style={toolbarTitleStyle}>Settings</span>
-        <div style={tabBarStyle}>
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.id;
-            const isHovered = hoveredTab === tab.id && !isActive;
-            return (
-              <button
-                key={tab.id}
-                style={{
-                  ...tabStyle,
-                  ...(isActive ? tabActiveStyle : {}),
-                  ...(isHovered ? tabHoverStyle : {}),
-                }}
-                onClick={() => handleTabClick(tab.id)}
-                onMouseEnter={() => setHoveredTab(tab.id)}
-                onMouseLeave={() => setHoveredTab(null)}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+        <div style={toolbarInnerStyle}>
+          <span style={toolbarTitleStyle}>Settings</span>
+          <div style={tabBarStyle}>
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              const isHovered = hoveredTab === tab.id && !isActive;
+              return (
+                <button
+                  key={tab.id}
+                  style={{
+                    ...tabStyle,
+                    ...(isActive ? tabActiveStyle : {}),
+                    ...(isHovered ? tabHoverStyle : {}),
+                  }}
+                  onClick={() => handleTabClick(tab.id)}
+                  onMouseEnter={() => setHoveredTab(tab.id)}
+                  onMouseLeave={() => setHoveredTab(null)}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -207,16 +182,6 @@ export function SettingsWindow() {
           {renderTabContent()}
         </div>
       </div>
-
-      {/* Save bar — only visible when there are unsaved changes */}
-      {hasUnsavedChanges && (
-        <div style={saveBarStyle}>
-          <span style={versionStyle}>REDE v1.0.0</span>
-          <button style={saveButtonStyle} onClick={saveSettings}>
-            Save Changes
-          </button>
-        </div>
-      )}
     </div>
   );
 }

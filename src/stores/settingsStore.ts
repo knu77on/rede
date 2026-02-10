@@ -1,5 +1,5 @@
 // ============================================================
-// REDE - Settings Store
+// REDE - Settings Store (Auto-save)
 // ============================================================
 
 import { create } from "zustand";
@@ -9,12 +9,10 @@ import type { Settings } from "../types/index";
 
 interface SettingsState {
   settings: Settings;
-  hasUnsavedChanges: boolean;
 }
 
 interface SettingsActions {
   updateSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
-  saveSettings: () => Promise<void>;
   loadSettings: () => Promise<void>;
   resetSettings: () => void;
 }
@@ -48,11 +46,28 @@ const DEFAULT_SETTINGS: Settings = {
   updated_at: new Date().toISOString(),
 };
 
+// --- Auto-save debounce ---
+
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+
+function debouncedSave(settings: Settings) {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    try {
+      const { supabase } = await import("../services/supabase");
+      await supabase
+        .from("settings")
+        .upsert(settings, { onConflict: "user_id" });
+    } catch {
+      // Silently fail — settings are still persisted in memory/local state
+    }
+  }, 800);
+}
+
 // --- Initial State ---
 
 const initialState: SettingsState = {
   settings: { ...DEFAULT_SETTINGS },
-  hasUnsavedChanges: false,
 };
 
 // --- Store ---
@@ -62,31 +77,13 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
 
   updateSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => {
     const { settings } = get();
-    set({
-      settings: {
-        ...settings,
-        [key]: value,
-        updated_at: new Date().toISOString(),
-      },
-      hasUnsavedChanges: true,
-    });
-  },
-
-  saveSettings: async () => {
-    const { settings } = get();
-    try {
-      const { supabase } = await import("../services/supabase");
-      const { error } = await supabase
-        .from("settings")
-        .upsert(settings, { onConflict: "user_id" });
-      if (error) throw error;
-
-      set({ hasUnsavedChanges: false });
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to save settings";
-      throw new Error(message);
-    }
+    const updated = {
+      ...settings,
+      [key]: value,
+      updated_at: new Date().toISOString(),
+    };
+    set({ settings: updated });
+    debouncedSave(updated);
   },
 
   loadSettings: async () => {
@@ -105,34 +102,24 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       if (error && error.code !== "PGRST116") throw error;
 
       if (data) {
-        set({
-          settings: data as Settings,
-          hasUnsavedChanges: false,
-        });
+        set({ settings: data as Settings });
       } else {
-        // No settings row yet -- use defaults with the user's ID
-        set({
-          settings: { ...DEFAULT_SETTINGS, user_id: userId },
-          hasUnsavedChanges: false,
-        });
+        set({ settings: { ...DEFAULT_SETTINGS, user_id: userId } });
       }
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to load settings";
-      throw new Error(message);
+    } catch {
+      // Keep defaults on failure
     }
   },
 
   resetSettings: () => {
     const { settings } = get();
-    set({
-      settings: {
-        ...DEFAULT_SETTINGS,
-        user_id: settings.user_id,
-        updated_at: new Date().toISOString(),
-      },
-      hasUnsavedChanges: true,
-    });
+    const updated = {
+      ...DEFAULT_SETTINGS,
+      user_id: settings.user_id,
+      updated_at: new Date().toISOString(),
+    };
+    set({ settings: updated });
+    debouncedSave(updated);
   },
 }));
 

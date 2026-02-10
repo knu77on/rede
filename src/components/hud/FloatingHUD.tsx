@@ -78,6 +78,7 @@ const stackContainerStyle: React.CSSProperties = {
   flexDirection: "column",
   alignItems: "center",
   pointerEvents: "auto",
+  transition: "transform 0.3s ease",
 };
 
 const equalizerContainerSizes: Record<HudSize, React.CSSProperties> = {
@@ -135,10 +136,10 @@ const cursorStyle: React.CSSProperties = {
   animation: "rede-cursor-blink 1s ease-in-out infinite",
 };
 
-// Correction — compact pill, not full-width
+// Correction — wrapping pill, grows upward
 const correctionPillStyle: React.CSSProperties = {
   marginTop: 8,
-  padding: "6px 14px",
+  padding: "8px 14px",
   borderRadius: 10,
   backgroundColor: `rgba(${COLOR_GREEN_RGB}, 0.12)`,
   border: `1px solid rgba(${COLOR_GREEN_RGB}, 0.25)`,
@@ -150,12 +151,13 @@ const correctionPillStyle: React.CSSProperties = {
   animation: "rede-correction-fadein 300ms ease-out",
   backdropFilter: "blur(16px)",
   WebkitBackdropFilter: "blur(16px)",
-  display: "inline-flex",
+  display: "flex",
+  flexWrap: "wrap",
   alignItems: "center",
+  justifyContent: "center",
   gap: 6,
-  maxWidth: 280,
-  whiteSpace: "nowrap",
-  overflow: "hidden",
+  maxWidth: 320,
+  wordBreak: "break-word",
 };
 
 // --- Helpers ---
@@ -165,11 +167,6 @@ function formatDuration(ms: number): string {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-}
-
-function truncate(text: string, max: number): string {
-  if (text.length <= max) return text;
-  return text.slice(0, max - 1) + "\u2026";
 }
 
 // --- Component ---
@@ -264,13 +261,13 @@ export const FloatingHUD: React.FC = () => {
           {/* 4. Smart Correction — compact pill */}
           {correction && (
             <div style={correctionPillStyle}>
-              <span style={{ fontWeight: 600 }}>Corrected</span>
-              <span style={{ color: COLOR_TERTIARY, textDecoration: "line-through", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {truncate(correction.original, 20)}
+              <span style={{ fontWeight: 600, flexShrink: 0 }}>Corrected</span>
+              <span style={{ color: COLOR_TERTIARY, textDecoration: "line-through" }}>
+                {correction.original}
               </span>
-              <span style={{ color: COLOR_GREEN }}>{"\u2192"}</span>
-              <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-                {truncate(correction.corrected, 24)}
+              <span style={{ color: COLOR_GREEN, flexShrink: 0 }}>{"\u2192"}</span>
+              <span>
+                {correction.corrected}
               </span>
             </div>
           )}
