@@ -11,7 +11,6 @@ import type { Settings } from "../types/index";
 interface UseSettingsResult {
   settings: Settings;
   updateSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
-  saveSettings: () => Promise<void>;
   resetSettings: () => void;
 }
 
@@ -20,7 +19,6 @@ interface UseSettingsResult {
 export function useSettings(): UseSettingsResult {
   const settings = useSettingsStore((s) => s.settings);
   const storeUpdateSetting = useSettingsStore((s) => s.updateSetting);
-  const storeSaveSettings = useSettingsStore((s) => s.saveSettings);
   const storeResetSettings = useSettingsStore((s) => s.resetSettings);
 
   const updateSetting = useCallback(
@@ -30,10 +28,6 @@ export function useSettings(): UseSettingsResult {
     [storeUpdateSetting],
   );
 
-  const saveSettings = useCallback(async () => {
-    await storeSaveSettings();
-  }, [storeSaveSettings]);
-
   const resetSettings = useCallback(() => {
     storeResetSettings();
   }, [storeResetSettings]);
@@ -41,7 +35,6 @@ export function useSettings(): UseSettingsResult {
   return {
     settings,
     updateSetting,
-    saveSettings,
     resetSettings,
   };
 }

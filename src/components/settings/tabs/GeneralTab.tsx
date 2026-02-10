@@ -7,6 +7,8 @@ import { useSettingsStore } from "../../../stores/settingsStore";
 import { Toggle } from "../../common/Toggle";
 import type { Theme, HudSize, HudPosition } from "../../../types/index";
 
+const APP_VERSION = "1.0.0";
+
 // --- Styles ---
 
 const styles: Record<string, CSSProperties> = {
@@ -196,6 +198,60 @@ function PositionGrid({
   );
 }
 
+// --- Update Button ---
+
+function UpdateButton() {
+  const [status, setStatus] = useState<"idle" | "checking" | "available" | "up-to-date" | "error">("idle");
+
+  const handleCheck = useCallback(async () => {
+    setStatus("checking");
+    try {
+      const { check } = await import("@tauri-apps/plugin-updater");
+      const update = await check();
+      setStatus(update ? "available" : "up-to-date");
+    } catch {
+      // In browser/demo mode, just show up-to-date
+      setStatus("up-to-date");
+    }
+  }, []);
+
+  const label =
+    status === "checking" ? "Checking\u2026" :
+    status === "available" ? "Update Available" :
+    status === "up-to-date" ? "Up to Date" :
+    status === "error" ? "Error" :
+    "Check for Updates";
+
+  const buttonStyle: CSSProperties = {
+    padding: "6px 14px",
+    borderRadius: 7,
+    border: status === "available"
+      ? "1px solid rgba(229, 57, 53, 0.3)"
+      : "1px solid rgba(255, 255, 255, 0.1)",
+    backgroundColor: status === "available"
+      ? "rgba(229, 57, 53, 0.1)"
+      : "rgba(255, 255, 255, 0.04)",
+    color: status === "available"
+      ? "#E53935"
+      : status === "up-to-date"
+      ? "#4CAF50"
+      : "#F5F5F7",
+    fontSize: 12,
+    fontWeight: 500,
+    cursor: status === "checking" ? "default" : "pointer",
+    transition: "all 0.12s ease",
+    fontFamily: "inherit",
+    whiteSpace: "nowrap" as const,
+    opacity: status === "checking" ? 0.6 : 1,
+  };
+
+  return (
+    <button style={buttonStyle} onClick={handleCheck} disabled={status === "checking"}>
+      {label}
+    </button>
+  );
+}
+
 // --- Component ---
 
 export function GeneralTab() {
@@ -336,6 +392,22 @@ export function GeneralTab() {
             label="Play Sounds"
             description="Audio feedback for recording events"
           />
+        </div>
+      </div>
+
+      {/* About & Updates */}
+      <div style={styles.section}>
+        <div style={styles.sectionTitle}>About</div>
+        <div style={styles.card}>
+          <div style={styles.row}>
+            <div>
+              <div style={styles.rowLabel}>REDE</div>
+              <div style={styles.rowDescription}>
+                Version {APP_VERSION}
+              </div>
+            </div>
+            <UpdateButton />
+          </div>
         </div>
       </div>
     </div>

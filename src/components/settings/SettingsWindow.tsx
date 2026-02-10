@@ -10,6 +10,10 @@ import { ProcessingTab } from "./tabs/ProcessingTab";
 import { PrivacyTab } from "./tabs/PrivacyTab";
 import { AccountTab } from "./tabs/AccountTab";
 
+interface SettingsWindowProps {
+  onClose?: () => void;
+}
+
 // --- Types ---
 
 type TabId = "general" | "voice" | "processing" | "privacy" | "account";
@@ -121,7 +125,25 @@ const contentInnerStyle: CSSProperties = {
 
 // --- Component ---
 
-export function SettingsWindow() {
+const closeButtonStyle: CSSProperties = {
+  width: 28,
+  height: 28,
+  borderRadius: 6,
+  border: "1px solid rgba(255, 255, 255, 0.08)",
+  backgroundColor: "rgba(255, 255, 255, 0.04)",
+  color: "#8E8E9A",
+  fontSize: 15,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  cursor: "pointer",
+  transition: "all 0.12s ease",
+  fontFamily: "inherit",
+  padding: 0,
+  flexShrink: 0,
+};
+
+export function SettingsWindow({ onClose }: SettingsWindowProps = {}) {
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [hoveredTab, setHoveredTab] = useState<TabId | null>(null);
 
@@ -151,7 +173,26 @@ export function SettingsWindow() {
       {/* Toolbar — title and tabs aligned with content column */}
       <div style={toolbarStyle}>
         <div style={toolbarInnerStyle}>
-          <span style={toolbarTitleStyle}>Settings</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {onClose && (
+              <button
+                style={closeButtonStyle}
+                onClick={onClose}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.08)";
+                  e.currentTarget.style.color = "#F5F5F7";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.04)";
+                  e.currentTarget.style.color = "#8E8E9A";
+                }}
+                title="Close settings"
+              >
+                {"\u2190"}
+              </button>
+            )}
+            <span style={toolbarTitleStyle}>Settings</span>
+          </div>
           <div style={tabBarStyle}>
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id;

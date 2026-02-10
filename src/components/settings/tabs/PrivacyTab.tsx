@@ -4,6 +4,7 @@
 
 import { type CSSProperties, useCallback, useState } from "react";
 import { useSettingsStore } from "../../../stores/settingsStore";
+import { useHistoryStore, type DictationEntry } from "../../../stores/historyStore";
 import { Toggle } from "../../common/Toggle";
 
 // --- Styles ---
@@ -156,12 +157,117 @@ const styles: Record<string, CSSProperties> = {
     cursor: "pointer",
     fontFamily: "inherit",
   },
-  retentionNote: {
-    fontSize: 11,
-    color: "#55555F",
-    lineHeight: "15px",
-    padding: "8px 0",
-  },
+};
+
+// --- History Entry ---
+
+const entryStyle: CSSProperties = {
+  padding: "10px 0",
+};
+
+const entryTextStyle: CSSProperties = {
+  fontSize: 13,
+  color: "#F5F5F7",
+  lineHeight: "18px",
+  wordBreak: "break-word",
+};
+
+const entryMetaStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  marginTop: 4,
+  fontSize: 11,
+  color: "#55555F",
+};
+
+const correctionBadgeStyle: CSSProperties = {
+  fontSize: 10,
+  fontWeight: 600,
+  color: "#4CAF50",
+  backgroundColor: "rgba(76, 175, 80, 0.1)",
+  border: "1px solid rgba(76, 175, 80, 0.2)",
+  borderRadius: 4,
+  padding: "1px 6px",
+};
+
+const copyButtonStyle: CSSProperties = {
+  marginLeft: "auto",
+  padding: "2px 8px",
+  borderRadius: 5,
+  border: "1px solid rgba(255, 255, 255, 0.06)",
+  backgroundColor: "transparent",
+  color: "#55555F",
+  fontSize: 11,
+  cursor: "pointer",
+  fontFamily: "inherit",
+  transition: "all 0.12s ease",
+};
+
+function formatTimeAgo(timestamp: number): string {
+  const diff = Date.now() - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours}h ${minutes % 60}m ago`;
+}
+
+function HistoryEntry({ entry }: { entry: DictationEntry }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(entry.text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  }, [entry.text]);
+
+  return (
+    <div style={entryStyle}>
+      <div style={entryTextStyle}>{entry.text}</div>
+      <div style={entryMetaStyle}>
+        <span>{formatTimeAgo(entry.createdAt)}</span>
+        <span>{entry.wordCount} {entry.wordCount === 1 ? "word" : "words"}</span>
+        {entry.wasCorrected && (
+          <span style={correctionBadgeStyle}>Corrected</span>
+        )}
+        <button
+          style={copyButtonStyle}
+          onClick={handleCopy}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#8E8E9A";
+            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "#55555F";
+            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)";
+          }}
+        >
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// --- Empty State ---
+
+const emptyStateStyle: CSSProperties = {
+  padding: "24px 0",
+  textAlign: "center",
+};
+
+const emptyIconStyle: CSSProperties = {
+  fontSize: 24,
+  marginBottom: 8,
+  opacity: 0.3,
+};
+
+const emptyTextStyle: CSSProperties = {
+  fontSize: 12,
+  color: "#55555F",
+  lineHeight: "17px",
 };
 
 // --- Component ---
@@ -169,11 +275,14 @@ const styles: Record<string, CSSProperties> = {
 export function PrivacyTab() {
   const settings = useSettingsStore((s) => s.settings);
   const updateSetting = useSettingsStore((s) => s.updateSetting);
+  const entries = useHistoryStore((s) => s.entries);
+  const clearAll = useHistoryStore((s) => s.clearAll);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const handleClearHistory = useCallback(() => {
+    clearAll();
     setShowClearConfirm(false);
-  }, []);
+  }, [clearAll]);
 
   const handleExportData = useCallback(() => {
     // TODO: Export user data
@@ -215,51 +324,75 @@ export function PrivacyTab() {
 
       {/* Dictation History */}
       <div style={styles.section}>
-        <div style={styles.sectionTitle}>Dictation History</div>
-        <div style={styles.card}>
-          <div style={styles.row}>
-            <div>
-              <div style={styles.rowLabel}>Recent Dictations</div>
-              <div style={styles.rowDescription}>
-                Your last 12 hours of dictations are kept locally so you can
-                review or copy them. After 12 hours they are automatically
-                deleted.
-              </div>
-            </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+          <div style={styles.sectionTitle}>
+            Dictation History
+            {entries.length > 0 && (
+              <span style={{ color: "#55555F", fontWeight: 400, marginLeft: 6 }}>
+                ({entries.length})
+              </span>
+            )}
           </div>
-
-          <div style={styles.divider} />
-
-          <div style={{ ...styles.row, flexDirection: "column" as const, alignItems: "flex-start", gap: 4 }}>
-            <div style={styles.rowLabel}>When Private Mode is on</div>
-            <div style={styles.rowDescription}>
-              Dictations are never stored — they are discarded immediately after
-              being inserted into the active text field. No history is kept.
-            </div>
-          </div>
-
-          <div style={styles.divider} />
-
-          <div style={styles.row}>
-            <div>
-              <div style={styles.rowLabel}>Clear History</div>
-              <div style={styles.rowDescription}>
-                Delete all local dictation history now
-              </div>
-            </div>
+          {entries.length > 0 && (
             <button
-              style={styles.dangerButton}
+              style={{ ...styles.dangerButton, padding: "4px 10px", fontSize: 11 }}
               onClick={() => setShowClearConfirm(true)}
             >
               Clear All
             </button>
-          </div>
+          )}
+        </div>
 
-          <div style={styles.retentionNote}>
-            Dictations older than 12 hours are automatically purged. Nothing is
-            ever sent to external servers unless Private Mode is off and you are
-            using cloud transcription.
+        {settings.private_mode && (
+          <div style={{
+            padding: "10px 14px",
+            borderRadius: 10,
+            backgroundColor: "rgba(255, 255, 255, 0.02)",
+            border: "1px solid rgba(255, 255, 255, 0.04)",
+            marginBottom: 12,
+          }}>
+            <div style={{ fontSize: 12, color: "#8E8E9A", lineHeight: "17px" }}>
+              Private Mode is on — dictations are discarded immediately and no
+              history is kept.
+            </div>
           </div>
+        )}
+
+        <div style={styles.card}>
+          {entries.length === 0 ? (
+            <div style={emptyStateStyle}>
+              <div style={emptyIconStyle}>{"\uD83C\uDF99\uFE0F"}</div>
+              <div style={emptyTextStyle}>
+                {settings.private_mode
+                  ? "No history in Private Mode"
+                  : "No dictations yet"}
+              </div>
+              <div style={{ ...emptyTextStyle, marginTop: 4, fontSize: 11 }}>
+                {settings.private_mode
+                  ? "Turn off Private Mode to keep a 12-hour history"
+                  : "Your last 12 hours of dictations will appear here"}
+              </div>
+            </div>
+          ) : (
+            <div style={{ maxHeight: 320, overflowY: "auto" }}>
+              {entries.map((entry, i) => (
+                <div key={entry.id}>
+                  {i > 0 && <div style={styles.divider} />}
+                  <HistoryEntry entry={entry} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div style={{
+          fontSize: 11,
+          color: "#55555F",
+          lineHeight: "15px",
+          padding: "8px 2px 0",
+        }}>
+          Dictations older than 12 hours are automatically deleted. Nothing is
+          stored outside your Mac.
         </div>
       </div>
 

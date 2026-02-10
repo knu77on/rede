@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { FloatingHUD } from "./components/hud/FloatingHUD";
 import { SettingsWindow } from "./components/settings/SettingsWindow";
 import { AuthScreen } from "./components/auth/AuthScreen";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useAuthStore } from "./stores/authStore";
+import { useRecordingStore } from "./stores/recordingStore";
+import { useHistoryStore } from "./stores/historyStore";
 import { isDemoMode, startDemoLoop } from "./demo";
 
 type View = "hud" | "settings" | "auth";
@@ -11,8 +13,9 @@ type View = "hud" | "settings" | "auth";
 function App() {
   const theme = useSettingsStore((s) => s.settings.theme);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const view = useAppView();
+  const urlView = useAppView();
   const demo = isDemoMode();
+  const [view, setView] = useState<View>(urlView);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -25,29 +28,195 @@ function App() {
     return cleanup;
   }, [demo]);
 
+  // Feed completed dictations into history store
+  useDictationHistory();
+
   // In demo mode, skip auth gate
   if (!demo && !isAuthenticated) {
     return <AuthScreen />;
   }
 
-  switch (view) {
-    case "settings":
-      return <SettingsWindow />;
-    case "auth":
-      return <AuthScreen />;
-    case "hud":
-    default:
-      return <DemoShell />;
+  if (view === "settings") {
+    return <SettingsWindow onClose={() => setView("hud")} />;
   }
+
+  if (view === "auth") {
+    return <AuthScreen />;
+  }
+
+  return (
+    <DemoShell onOpenSettings={() => setView("settings")} />
+  );
+}
+
+// --- Hook: Feed dictations into history ---
+
+function useDictationHistory() {
+  const transcription = useRecordingStore((s) => s.transcription);
+  const duration = useRecordingStore((s) => s.duration);
+  const wordCount = useRecordingStore((s) => s.wordCount);
+  const addEntry = useHistoryStore((s) => s.addEntry);
+  const lastTextRef = useRef("");
+
+  useEffect(() => {
+    if (!transcription || transcription === lastTextRef.current) return;
+    lastTextRef.current = transcription;
+
+    // Small delay to let correction arrive
+    const timer = setTimeout(() => {
+      const currentCorrection = useRecordingStore.getState().correction;
+      addEntry({
+        text: transcription,
+        originalText: currentCorrection?.original ?? null,
+        wasCorrected: !!currentCorrection,
+        wordCount,
+        duration,
+        createdAt: Date.now(),
+      });
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [transcription, addEntry, wordCount, duration]);
+}
+
+// --- Hook: Control key HUD activation ---
+
+function useHudVisibility() {
+  const [visible, setVisible] = useState(false);
+  const activationMode = useSettingsStore((s) => s.settings.activation_mode);
+  const controlTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastControlRef = useRef(0);
+
+  const show = useCallback(() => setVisible(true), []);
+  const hide = useCallback(() => setVisible(false), []);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key !== "Control") return;
+
+      if (activationMode === "push") {
+        // Hold Control = show
+        show();
+      } else {
+        // Toggle mode: double-press Control
+        const now = Date.now();
+        if (now - lastControlRef.current < 400) {
+          // Double press detected
+          setVisible((prev) => !prev);
+          lastControlRef.current = 0;
+        } else {
+          lastControlRef.current = now;
+        }
+      }
+    }
+
+    function handleKeyUp(e: KeyboardEvent) {
+      if (e.key !== "Control") return;
+      if (activationMode === "push") {
+        // Release Control = hide (after a grace period for results to show)
+        if (controlTimerRef.current) clearTimeout(controlTimerRef.current);
+        controlTimerRef.current = setTimeout(hide, 200);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      if (controlTimerRef.current) clearTimeout(controlTimerRef.current);
+    };
+  }, [activationMode, show, hide]);
+
+  // Also show when recording state changes (recording/processing/transcription)
+  const recordingState = useRecordingStore((s) => s.state);
+  const transcription = useRecordingStore((s) => s.transcription);
+
+  useEffect(() => {
+    if (recordingState === "recording" || recordingState === "processing") {
+      show();
+    }
+  }, [recordingState, show]);
+
+  // Keep visible briefly after transcription appears, then fade out
+  useEffect(() => {
+    if (!transcription) return;
+    show();
+    const timer = setTimeout(hide, 5000);
+    return () => clearTimeout(timer);
+  }, [transcription, show, hide]);
+
+  return visible;
+}
+
+// --- HUD Wrapper with fade ---
+
+const hudFadeKeyframes = `
+@keyframes rede-hud-fadein {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes rede-hud-fadeout {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.95) translateY(8px); }
+}
+`;
+
+function HudWithVisibility({ alwaysVisible }: { alwaysVisible?: boolean }) {
+  const visible = useHudVisibility();
+  const shouldShow = alwaysVisible || visible;
+  const [mounted, setMounted] = useState(shouldShow);
+  const [animating, setAnimating] = useState<"in" | "out" | null>(null);
+
+  useEffect(() => {
+    if (shouldShow && !mounted) {
+      setMounted(true);
+      setAnimating("in");
+    } else if (!shouldShow && mounted) {
+      setAnimating("out");
+      const timer = setTimeout(() => {
+        setMounted(false);
+        setAnimating(null);
+      }, 250);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldShow, mounted]);
+
+  useEffect(() => {
+    if (animating === "in") {
+      const timer = setTimeout(() => setAnimating(null), 250);
+      return () => clearTimeout(timer);
+    }
+  }, [animating]);
+
+  if (!mounted) return <style>{hudFadeKeyframes}</style>;
+
+  return (
+    <>
+      <style>{hudFadeKeyframes}</style>
+      <div
+        style={{
+          animation: animating === "in"
+            ? "rede-hud-fadein 250ms ease-out forwards"
+            : animating === "out"
+            ? "rede-hud-fadeout 250ms ease-out forwards"
+            : undefined,
+        }}
+      >
+        <FloatingHUD />
+      </div>
+    </>
+  );
 }
 
 /** Wraps the HUD with a visible background and navigation for demo/dev */
-function DemoShell() {
+function DemoShell({ onOpenSettings }: { onOpenSettings: () => void }) {
   const demo = isDemoMode();
   const [showNav, setShowNav] = useState(true);
 
   if (!demo) {
-    return <FloatingHUD />;
+    return <HudWithVisibility />;
   }
 
   return (
@@ -66,8 +235,9 @@ function DemoShell() {
       }}
     >
       {showNav && <DemoBanner onClose={() => setShowNav(false)} />}
-      <FloatingHUD />
-      {showNav && <DemoNav />}
+      {/* In demo mode, HUD is always visible so you can see it */}
+      <HudWithVisibility alwaysVisible />
+      {showNav && <DemoNav onOpenSettings={onOpenSettings} />}
     </div>
   );
 }
@@ -111,7 +281,7 @@ function DemoBanner({ onClose }: { onClose: () => void }) {
   );
 }
 
-function DemoNav() {
+function DemoNav({ onOpenSettings }: { onOpenSettings: () => void }) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   const linkStyle = (key: string): React.CSSProperties => ({
@@ -132,22 +302,14 @@ function DemoNav() {
 
   return (
     <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-      <a
-        href="/?demo"
-        style={linkStyle("hud")}
-        onMouseEnter={() => setHovered("hud")}
-        onMouseLeave={() => setHovered(null)}
-      >
-        HUD View
-      </a>
-      <a
-        href="/?demo&view=settings"
+      <button
         style={linkStyle("settings")}
+        onClick={onOpenSettings}
         onMouseEnter={() => setHovered("settings")}
         onMouseLeave={() => setHovered(null)}
       >
         Settings
-      </a>
+      </button>
       <a
         href="/?demo&view=auth"
         style={linkStyle("auth")}
@@ -155,14 +317,6 @@ function DemoNav() {
         onMouseLeave={() => setHovered(null)}
       >
         Auth Screen
-      </a>
-      <a
-        href="/"
-        style={{ ...linkStyle("exit"), color: "#55555F" }}
-        onMouseEnter={() => setHovered("exit")}
-        onMouseLeave={() => setHovered(null)}
-      >
-        Exit Demo
       </a>
     </div>
   );

@@ -1,32 +1,54 @@
 // ============================================================
-// REDE - History Store
+// REDE - Dictation History Store
 // ============================================================
 
 import { create } from "zustand";
-import type { HistoryItem } from "../types/index";
+import { useSettingsStore } from "./settingsStore";
 
 // --- Types ---
 
+export interface DictationEntry {
+  id: string;
+  text: string;
+  originalText: string | null;
+  wasCorrected: boolean;
+  wordCount: number;
+  duration: number;
+  createdAt: number; // timestamp ms
+}
+
 interface HistoryState {
-  items: HistoryItem[];
-  isLoading: boolean;
+  entries: DictationEntry[];
 }
 
 interface HistoryActions {
-  addItem: (item: HistoryItem) => void;
-  removeItem: (id: string) => void;
-  clearHistory: () => Promise<void>;
-  loadHistory: () => Promise<void>;
-  searchHistory: (query: string) => HistoryItem[];
+  addEntry: (entry: Omit<DictationEntry, "id">) => void;
+  clearAll: () => void;
+  purgeExpired: () => void;
 }
 
 export type HistoryStore = HistoryState & HistoryActions;
 
+// --- Constants ---
+
+const MAX_RETENTION_MS = 12 * 60 * 60 * 1000; // 12 hours
+
+// --- Helpers ---
+
+function generateId(): string {
+  const random = Math.random().toString(36).substring(2, 8);
+  return `${Date.now()}-${random}`;
+}
+
+function removeExpired(entries: DictationEntry[]): DictationEntry[] {
+  const cutoff = Date.now() - MAX_RETENTION_MS;
+  return entries.filter((entry) => entry.createdAt > cutoff);
+}
+
 // --- Initial State ---
 
 const initialState: HistoryState = {
-  items: [],
-  isLoading: false,
+  entries: [],
 };
 
 // --- Store ---
@@ -34,82 +56,22 @@ const initialState: HistoryState = {
 export const useHistoryStore = create<HistoryStore>((set, get) => ({
   ...initialState,
 
-  addItem: (item: HistoryItem) => {
-    const { items } = get();
-    // Prepend new item and sort by created_at descending
-    const updated = [item, ...items].sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    );
-    set({ items: updated });
+  addEntry: (entry: Omit<DictationEntry, "id">) => {
+    const { settings } = useSettingsStore.getState();
+    if (settings.private_mode) return;
+
+    const { entries } = get();
+    const newEntry: DictationEntry = { id: generateId(), ...entry };
+    const updated = removeExpired([newEntry, ...entries]);
+    set({ entries: updated });
   },
 
-  removeItem: (id: string) => {
-    const { items } = get();
-    set({ items: items.filter((item) => item.id !== id) });
+  clearAll: () => {
+    set({ entries: [] });
   },
 
-  clearHistory: async () => {
-    set({ isLoading: true });
-    try {
-      const { supabase } = await import("../services/supabase");
-      const { data: sessionData } = await supabase.auth.getSession();
-      const userId = sessionData.session?.user?.id;
-
-      if (userId) {
-        const { error } = await supabase
-          .from("history")
-          .delete()
-          .eq("user_id", userId);
-        if (error) throw error;
-      }
-
-      set({ items: [], isLoading: false });
-    } catch {
-      set({ isLoading: false });
-    }
-  },
-
-  loadHistory: async () => {
-    set({ isLoading: true });
-    try {
-      const { supabase } = await import("../services/supabase");
-      const { data: sessionData } = await supabase.auth.getSession();
-      const userId = sessionData.session?.user?.id;
-      if (!userId) {
-        set({ isLoading: false });
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("history")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      set({
-        items: (data ?? []) as HistoryItem[],
-        isLoading: false,
-      });
-    } catch {
-      set({ isLoading: false });
-    }
-  },
-
-  searchHistory: (query: string): HistoryItem[] => {
-    const { items } = get();
-    if (!query.trim()) return items;
-
-    const lower = query.toLowerCase();
-    return items.filter(
-      (item) =>
-        item.text.toLowerCase().includes(lower) ||
-        (item.original_text &&
-          item.original_text.toLowerCase().includes(lower)) ||
-        (item.target_app &&
-          item.target_app.toLowerCase().includes(lower)),
-    );
+  purgeExpired: () => {
+    const { entries } = get();
+    set({ entries: removeExpired(entries) });
   },
 }));

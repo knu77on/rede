@@ -43,7 +43,7 @@ function escapeRegex(str: string): string {
 /** Format text for specific app context */
 export function formatForContext(
   text: string,
-  context: { tone: string; emoji: boolean },
+  _context: { tone: string; emoji: boolean },
 ): string {
   // For now, return text as-is
   // Future: AI-powered tone adjustment

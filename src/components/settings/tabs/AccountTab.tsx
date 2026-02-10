@@ -253,7 +253,7 @@ export function AccountTab() {
   // TODO: Fetch actual subscription from a subscription store
   // For now, show a placeholder status
   const subscriptionStatus = "active";
-  const subscriptionPlan = "monthly";
+  const subscriptionPlan: string = "monthly";
 
   return (
     <div>

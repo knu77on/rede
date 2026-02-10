@@ -28,7 +28,7 @@
       "tooltip": "REDE - Voice Dictation"
     },
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' https://api.openai.com https://api.anthropic.com https://*.supabase.co; style-src 'self' 'unsafe-inline'"
+      "csp": "default-src 'self'; connect-src 'self' https://api.openai.com https://api.anthropic.com https://*.supabase.co https://github.com https://api.github.com; style-src 'self' 'unsafe-inline'"
     }
   },
   "bundle": {
@@ -46,6 +46,14 @@
       "minimumSystemVersion": "12.0",
       "frameworks": [],
       "signingIdentity": null
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/knu77on/rede/releases/latest/download/latest.json"
+      ],
+      "pubkey": ""
     }
   }
 }
