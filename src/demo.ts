@@ -61,7 +61,18 @@ let cleanupQueue: (() => void)[] = [];
 // --- Public API ---
 
 export function isDemoMode(): boolean {
-  return new URLSearchParams(window.location.search).has("demo");
+  // Explicit ?demo in URL always activates demo
+  if (new URLSearchParams(window.location.search).has("demo")) return true;
+
+  // Auto-activate demo when no Supabase backend is configured
+  // so the app works out of the box for development/demos
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseKey || supabaseUrl === "https://your-project.supabase.co") {
+    return true;
+  }
+
+  return false;
 }
 
 export function startDemoLoop(): () => void {

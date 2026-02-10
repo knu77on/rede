@@ -44,7 +44,7 @@ function App() {
 /** Wraps the HUD with a visible background and navigation for demo/dev */
 function DemoShell() {
   const demo = isDemoMode();
-  const [showNav, setShowNav] = useState(demo);
+  const [showNav, setShowNav] = useState(true);
 
   if (!demo) {
     return <FloatingHUD />;
