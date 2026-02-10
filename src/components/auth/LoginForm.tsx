@@ -26,7 +26,7 @@ const formStyle: React.CSSProperties = {
 
 const forgotLinkStyle: React.CSSProperties = {
   fontSize: 13,
-  color: "#7B61FF",
+  color: "#E53935",
   fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   background: "none",
   border: "none",

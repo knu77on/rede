@@ -49,7 +49,7 @@ const itemStyle: React.CSSProperties = {
 };
 
 const hoveredItemStyle: React.CSSProperties = {
-  backgroundColor: "rgba(123, 97, 255, 0.12)",
+  backgroundColor: "rgba(229, 57, 53, 0.1)",
 };
 
 const disabledItemStyle: React.CSSProperties = {
@@ -228,7 +228,7 @@ const MenuItemButton: React.FC<MenuItemButtonProps> = ({
         <div
           style={{
             ...toggleTrackStyle,
-            backgroundColor: checked ? "#7B61FF" : "rgba(255, 255, 255, 0.15)",
+            backgroundColor: checked ? "#E53935" : "rgba(255, 255, 255, 0.15)",
           }}
         >
           <div

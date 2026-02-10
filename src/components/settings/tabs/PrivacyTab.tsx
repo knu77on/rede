@@ -32,8 +32,8 @@ const styles: Record<string, CSSProperties> = {
     margin: 0,
   },
   infoBox: {
-    backgroundColor: "rgba(123, 97, 255, 0.08)",
-    border: "1px solid rgba(123, 97, 255, 0.15)",
+    backgroundColor: "rgba(229, 57, 53, 0.08)",
+    border: "1px solid rgba(229, 57, 53, 0.15)",
     borderRadius: 10,
     padding: "14px 16px",
     marginBottom: 24,

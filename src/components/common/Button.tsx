@@ -20,9 +20,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 // --- Styles ---
 
-const ACCENT = "#7B61FF";
-const ACCENT_HOVER = "#6B51EF";
-const ACCENT_ACTIVE = "#5B41DF";
+const ACCENT = "#E53935";
+const ACCENT_HOVER = "#EF5350";
+const ACCENT_ACTIVE = "#C62828";
 
 const baseStyle: React.CSSProperties = {
   display: "inline-flex",

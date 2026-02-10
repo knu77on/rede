@@ -85,7 +85,7 @@ const styles: Record<string, CSSProperties> = {
     fontFamily: "inherit",
   },
   tabActive: {
-    backgroundColor: "rgba(123, 97, 255, 0.15)",
+    backgroundColor: "rgba(229, 57, 53, 0.12)",
     color: "#FFFFFF",
   },
   tabHover: {
@@ -196,8 +196,8 @@ export function SettingsWindow() {
               margin: "auto 16px 0",
               padding: "10px 12px",
               borderRadius: 8,
-              backgroundColor: "rgba(123, 97, 255, 0.1)",
-              border: "1px solid rgba(123, 97, 255, 0.2)",
+              backgroundColor: "rgba(229, 57, 53, 0.08)",
+              border: "1px solid rgba(229, 57, 53, 0.18)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -208,7 +208,7 @@ export function SettingsWindow() {
               style={{
                 background: "none",
                 border: "none",
-                color: "#7B61FF",
+                color: "#E53935",
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: "pointer",

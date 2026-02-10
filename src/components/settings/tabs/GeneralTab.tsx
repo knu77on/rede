@@ -69,9 +69,9 @@ const styles: Record<string, CSSProperties> = {
     fontFamily: "inherit",
   },
   segmentButtonActive: {
-    backgroundColor: "#7B61FF",
+    backgroundColor: "#E53935",
     color: "#FFFFFF",
-    boxShadow: "0 2px 8px rgba(123, 97, 255, 0.3)",
+    boxShadow: "0 2px 8px rgba(229, 57, 53, 0.3)",
   },
 };
 

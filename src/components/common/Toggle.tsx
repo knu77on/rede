@@ -60,7 +60,7 @@ const styles: Record<string, CSSProperties> = {
     cursor: "pointer",
   },
   trackChecked: {
-    backgroundColor: "#7B61FF",
+    backgroundColor: "#E53935",
   },
   thumb: {
     position: "absolute",
@@ -75,7 +75,7 @@ const styles: Record<string, CSSProperties> = {
   },
   thumbChecked: {
     transform: "translateX(18px)",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.3), 0 0 8px rgba(123, 97, 255, 0.4)",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.3), 0 0 8px rgba(229, 57, 53, 0.4)",
   },
 };
 

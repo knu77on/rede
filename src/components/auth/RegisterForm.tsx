@@ -70,7 +70,7 @@ const termsTextStyle: React.CSSProperties = {
 };
 
 const termsLinkStyle: React.CSSProperties = {
-  color: "#7B61FF",
+  color: "#E53935",
   textDecoration: "none",
   cursor: "pointer",
 };

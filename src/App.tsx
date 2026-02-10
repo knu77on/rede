@@ -55,13 +55,13 @@ function DemoShell() {
       style={{
         width: "100vw",
         height: "100vh",
-        backgroundColor: "#0a0a0e",
+        backgroundColor: "#08080C",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         fontFamily:
-          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         gap: 32,
       }}
     >
@@ -81,14 +81,16 @@ function DemoBanner({ onClose }: { onClose: () => void }) {
         gap: 12,
         padding: "10px 20px",
         borderRadius: 10,
-        backgroundColor: "rgba(123, 97, 255, 0.12)",
-        border: "1px solid rgba(123, 97, 255, 0.25)",
-        color: "#c4b5fd",
+        backgroundColor: "rgba(229, 57, 53, 0.08)",
+        border: "1px solid rgba(229, 57, 53, 0.2)",
+        color: "#E53935",
         fontSize: 13,
+        fontFamily:
+          '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       }}
     >
       <span style={{ fontWeight: 600 }}>DEMO MODE</span>
-      <span style={{ color: "#8b80b0" }}>
+      <span style={{ color: "#8E8E9A" }}>
         Simulated recording &mdash; no microphone or APIs needed
       </span>
       <button
@@ -96,7 +98,7 @@ function DemoBanner({ onClose }: { onClose: () => void }) {
         style={{
           background: "none",
           border: "none",
-          color: "#606070",
+          color: "#55555F",
           cursor: "pointer",
           fontSize: 16,
           marginLeft: 8,
@@ -110,30 +112,56 @@ function DemoBanner({ onClose }: { onClose: () => void }) {
 }
 
 function DemoNav() {
-  const linkStyle: React.CSSProperties = {
+  const [hovered, setHovered] = useState<string | null>(null);
+
+  const linkStyle = (key: string): React.CSSProperties => ({
     padding: "8px 16px",
     borderRadius: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
-    color: "#a0a0b0",
+    backgroundColor:
+      hovered === key ? "rgba(229, 57, 53, 0.1)" : "rgba(255, 255, 255, 0.04)",
+    border: `1px solid ${hovered === key ? "rgba(229, 57, 53, 0.2)" : "rgba(255, 255, 255, 0.06)"}`,
+    color: hovered === key ? "#E53935" : "#8E8E9A",
     fontSize: 13,
+    fontWeight: 500,
     textDecoration: "none",
     cursor: "pointer",
     transition: "all 0.15s ease",
-  };
+    fontFamily:
+      '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  });
 
   return (
     <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-      <a href="/?demo" style={linkStyle}>
+      <a
+        href="/?demo"
+        style={linkStyle("hud")}
+        onMouseEnter={() => setHovered("hud")}
+        onMouseLeave={() => setHovered(null)}
+      >
         HUD View
       </a>
-      <a href="/?demo&view=settings" style={linkStyle}>
+      <a
+        href="/?demo&view=settings"
+        style={linkStyle("settings")}
+        onMouseEnter={() => setHovered("settings")}
+        onMouseLeave={() => setHovered(null)}
+      >
         Settings
       </a>
-      <a href="/?demo&view=auth" style={linkStyle}>
+      <a
+        href="/?demo&view=auth"
+        style={linkStyle("auth")}
+        onMouseEnter={() => setHovered("auth")}
+        onMouseLeave={() => setHovered(null)}
+      >
         Auth Screen
       </a>
-      <a href="/" style={{ ...linkStyle, color: "#606070" }}>
+      <a
+        href="/"
+        style={{ ...linkStyle("exit"), color: "#55555F" }}
+        onMouseEnter={() => setHovered("exit")}
+        onMouseLeave={() => setHovered(null)}
+      >
         Exit Demo
       </a>
     </div>

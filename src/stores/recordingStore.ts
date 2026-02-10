@@ -7,6 +7,11 @@ import type { RecordingState } from "../types/index";
 
 // --- Types ---
 
+export interface Correction {
+  original: string;
+  corrected: string;
+}
+
 interface RecordingStoreState {
   state: RecordingState;
   duration: number;
@@ -14,6 +19,7 @@ interface RecordingStoreState {
   audioLevels: number[];
   error: string | null;
   wordCount: number;
+  correction: Correction | null;
 }
 
 interface RecordingActions {
@@ -22,6 +28,7 @@ interface RecordingActions {
   cancelRecording: () => void;
   setAudioLevels: (levels: number[]) => void;
   setTranscription: (text: string) => void;
+  setCorrection: (correction: Correction | null) => void;
   setError: (msg: string) => void;
   reset: () => void;
 }
@@ -37,6 +44,7 @@ const initialState: RecordingStoreState = {
   audioLevels: [],
   error: null,
   wordCount: 0,
+  correction: null,
 };
 
 // --- Helpers ---
@@ -63,6 +71,7 @@ export const useRecordingStore = create<RecordingStore>((set, get) => ({
       audioLevels: [],
       error: null,
       wordCount: 0,
+      correction: null,
     });
   },
 
@@ -79,6 +88,7 @@ export const useRecordingStore = create<RecordingStore>((set, get) => ({
       duration: 0,
       audioLevels: [],
       error: null,
+      correction: null,
     });
   },
 
@@ -94,6 +104,10 @@ export const useRecordingStore = create<RecordingStore>((set, get) => ({
       wordCount: countWords(text),
       audioLevels: [],
     });
+  },
+
+  setCorrection: (correction: Correction | null) => {
+    set({ correction });
   },
 
   setError: (msg: string) => {

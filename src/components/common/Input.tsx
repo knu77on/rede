@@ -22,7 +22,7 @@ interface InputProps {
 
 // --- Styles ---
 
-const ACCENT = "#7B61FF";
+const ACCENT = "#E53935";
 const ERROR_COLOR = "#F87171";
 
 const wrapperStyle: React.CSSProperties = {
@@ -100,7 +100,7 @@ export const Input: React.FC<InputProps> = ({
           borderColor: error ? ERROR_COLOR : focusedBorderColor,
           boxShadow: error
             ? `0 0 0 3px rgba(248, 113, 113, 0.15)`
-            : `0 0 0 3px rgba(123, 97, 255, 0.15)`,
+            : `0 0 0 3px rgba(229, 57, 53, 0.15)`,
         }
       : {}),
     ...(error && !focused ? errorInputOverride : {}),

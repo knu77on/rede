@@ -46,11 +46,11 @@ const logoStyle: React.CSSProperties = {
   width: 56,
   height: 56,
   borderRadius: 14,
-  backgroundColor: "#7B61FF",
+  backgroundColor: "#E53935",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  boxShadow: "0 4px 24px rgba(123, 97, 255, 0.3)",
+  boxShadow: "0 4px 24px rgba(229, 57, 53, 0.3)",
 };
 
 const logoTextStyle: React.CSSProperties = {

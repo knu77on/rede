@@ -1,5 +1,6 @@
 // ============================================================
 // REDE - Audio Equalizer Visualization Component
+// Premium RED gradient bars with glow effects
 // ============================================================
 
 import React from "react";
@@ -18,36 +19,44 @@ const containerStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "flex-end",
   justifyContent: "center",
-  gap: 3,
+  gap: 4,
   height: "100%",
   minHeight: 32,
 };
 
 const barBaseStyle: React.CSSProperties = {
-  width: 4,
-  borderRadius: 2,
-  transition: "height 120ms ease-out, opacity 150ms ease",
-  minHeight: 3,
+  width: 5,
+  borderRadius: 2.5,
+  transition: "height 120ms ease-out, opacity 150ms ease, box-shadow 150ms ease",
+  minHeight: 4,
 };
 
 // --- Keyframes ---
 
-const glowKeyframes = `
+const equalizerKeyframes = `
 @keyframes rede-eq-idle-pulse {
-  0%, 100% { height: 15%; opacity: 0.4; }
-  50% { height: 25%; opacity: 0.6; }
+  0%, 100% { height: 15%; opacity: 0.35; }
+  50% { height: 25%; opacity: 0.55; }
 }
 `;
 
 // --- Helpers ---
 
-function getBarGradient(index: number, total: number): string {
-  // Gradient from #7B61FF (left) to #5B41DF (right)
+function getBarColor(index: number, total: number): string {
+  // Gradient from REDE_RED (#E53935) left to REDE_RED_DEEP (#C62828) right
   const t = total > 1 ? index / (total - 1) : 0;
-  const r = Math.round(123 + (91 - 123) * t);
-  const g = Math.round(97 + (65 - 97) * t);
-  const b = Math.round(255 + (223 - 255) * t);
+  const r = Math.round(229 + (198 - 229) * t);
+  const g = Math.round(57 + (40 - 57) * t);
+  const b = Math.round(53 + (40 - 53) * t);
   return `rgb(${r}, ${g}, ${b})`;
+}
+
+function getBarGlow(index: number, total: number): string {
+  const t = total > 1 ? index / (total - 1) : 0;
+  const r = Math.round(229 + (198 - 229) * t);
+  const g = Math.round(57 + (40 - 57) * t);
+  const b = Math.round(53 + (40 - 53) * t);
+  return `0 0 8px rgba(${r}, ${g}, ${b}, 0.6), 0 0 16px rgba(${r}, ${g}, ${b}, 0.3)`;
 }
 
 // --- Component ---
@@ -62,7 +71,6 @@ export const Equalizer: React.FC<EqualizerProps> = ({
     const result: number[] = [];
     for (let i = 0; i < barCount; i++) {
       if (i < levels.length) {
-        // Clamp between 0 and 1
         result.push(Math.max(0, Math.min(1, levels[i])));
       } else {
         result.push(0);
@@ -73,21 +81,22 @@ export const Equalizer: React.FC<EqualizerProps> = ({
 
   return (
     <>
-      <style>{glowKeyframes}</style>
+      <style>{equalizerKeyframes}</style>
       <div style={containerStyle} role="img" aria-label="Audio level visualization">
         {normalizedLevels.map((level, index) => {
           const heightPercent = isActive
             ? Math.max(10, level * 100)
             : 15;
 
+          const color = getBarColor(index, barCount);
+          const showGlow = isActive && level > 0.5;
+
           const barStyle: React.CSSProperties = {
             ...barBaseStyle,
             height: isActive ? `${heightPercent}%` : undefined,
-            backgroundColor: getBarGradient(index, barCount),
+            backgroundColor: color,
             opacity: isActive ? 0.6 + level * 0.4 : 0.3,
-            boxShadow: isActive && level > 0.5
-              ? `0 0 6px ${getBarGradient(index, barCount)}40`
-              : "none",
+            boxShadow: showGlow ? getBarGlow(index, barCount) : "none",
             ...(
               !isActive
                 ? {
