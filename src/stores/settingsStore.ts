@@ -40,6 +40,7 @@ const DEFAULT_SETTINGS: Settings = {
   language: "en",
   theme: "dark",
   hud_size: "balanced",
+  hud_position: "bottom-center",
   show_glow: true,
   show_stats: true,
   play_sounds: true,

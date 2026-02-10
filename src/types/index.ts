@@ -113,6 +113,14 @@ export interface HistoryItem {
 export type ActivationMode = "push" | "toggle";
 export type Theme = "dark" | "light";
 export type HudSize = "compact" | "balanced" | "immersive";
+export type HudPosition =
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "center"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right";
 
 export interface Settings {
   user_id: string;
@@ -131,6 +139,7 @@ export interface Settings {
   language: string;
   theme: Theme;
   hud_size: HudSize;
+  hud_position: HudPosition;
   show_glow: boolean;
   show_stats: boolean;
   play_sounds: boolean;

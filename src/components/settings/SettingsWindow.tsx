@@ -1,5 +1,6 @@
 // ============================================================
-// REDE - Settings Window (Main Container)
+// REDE - Settings Window
+// macOS System Settings–inspired layout with top toolbar tabs
 // ============================================================
 
 import { type CSSProperties, useState, useCallback } from "react";
@@ -14,121 +15,133 @@ import { AccountTab } from "./tabs/AccountTab";
 
 type TabId = "general" | "voice" | "processing" | "privacy" | "account";
 
-interface TabDefinition {
+interface TabDef {
   id: TabId;
   label: string;
-  icon: string;
 }
 
 // --- Constants ---
 
-const TABS: TabDefinition[] = [
-  { id: "general", label: "General", icon: "\u2699" },
-  { id: "voice", label: "Voice", icon: "\uD83C\uDF99" },
-  { id: "processing", label: "Processing", icon: "\u2728" },
-  { id: "privacy", label: "Privacy", icon: "\uD83D\uDD12" },
-  { id: "account", label: "Account", icon: "\uD83D\uDC64" },
+const TABS: TabDef[] = [
+  { id: "general", label: "General" },
+  { id: "voice", label: "Voice" },
+  { id: "processing", label: "Processing" },
+  { id: "privacy", label: "Privacy" },
+  { id: "account", label: "Account" },
 ];
 
 // --- Styles ---
 
-const styles: Record<string, CSSProperties> = {
-  window: {
-    display: "flex",
-    width: "100%",
-    height: "100vh",
-    backgroundColor: "rgba(18, 18, 22, 0.95)",
-    color: "#FFFFFF",
-    fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-    overflow: "hidden",
-  },
-  sidebar: {
-    display: "flex",
-    flexDirection: "column",
-    width: 220,
-    minWidth: 220,
-    backgroundColor: "rgba(14, 14, 18, 0.98)",
-    borderRight: "1px solid rgba(255, 255, 255, 0.08)",
-    padding: "24px 0",
-    gap: 2,
-  },
-  sidebarHeader: {
-    padding: "0 20px 20px",
-    fontSize: 13,
-    fontWeight: 600,
-    color: "#A0A0B0",
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.05em",
-  },
-  tabList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 2,
-    padding: "0 8px",
-  },
-  tab: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    padding: "10px 12px",
-    borderRadius: 8,
-    border: "none",
-    backgroundColor: "transparent",
-    color: "#A0A0B0",
-    fontSize: 14,
-    fontWeight: 500,
-    cursor: "pointer",
-    transition: "all 0.15s ease",
-    textAlign: "left" as const,
-    width: "100%",
-    fontFamily: "inherit",
-  },
-  tabActive: {
-    backgroundColor: "rgba(229, 57, 53, 0.12)",
-    color: "#FFFFFF",
-  },
-  tabHover: {
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
-  },
-  tabIcon: {
-    fontSize: 16,
-    width: 20,
-    textAlign: "center" as const,
-  },
-  content: {
-    flex: 1,
-    overflow: "auto",
-    padding: "32px 40px",
-  },
-  contentHeader: {
-    fontSize: 24,
-    fontWeight: 700,
-    color: "#FFFFFF",
-    marginBottom: 8,
-  },
-  contentSubheader: {
-    fontSize: 14,
-    color: "#A0A0B0",
-    marginBottom: 32,
-  },
-  versionBadge: {
-    marginTop: "auto",
-    padding: "12px 20px",
-    fontSize: 11,
-    color: "#606070",
-    textAlign: "center" as const,
-  },
+const windowStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  height: "100vh",
+  backgroundColor: "#0E0E12",
+  color: "#F5F5F7",
+  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  overflow: "hidden",
 };
 
-// --- Tab Descriptions ---
+// Toolbar — thin bar at the top, macOS style
+const toolbarStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: "0 24px",
+  height: 52,
+  minHeight: 52,
+  borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+  backgroundColor: "rgba(14, 14, 18, 0.95)",
+  backdropFilter: "blur(20px)",
+  WebkitBackdropFilter: "blur(20px)",
+  userSelect: "none",
+};
 
-const TAB_DESCRIPTIONS: Record<TabId, string> = {
-  general: "Appearance, behavior, and system preferences",
-  voice: "Microphone, activation, and audio settings",
-  processing: "Text correction, formatting, and language",
-  privacy: "Data handling, analytics, and history",
-  account: "Profile, subscription, and sign out",
+const toolbarTitleStyle: CSSProperties = {
+  fontSize: 13,
+  fontWeight: 600,
+  color: "#F5F5F7",
+  letterSpacing: "-0.01em",
+};
+
+const tabBarStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 2,
+  backgroundColor: "rgba(255, 255, 255, 0.04)",
+  borderRadius: 7,
+  padding: 2,
+};
+
+const tabStyle: CSSProperties = {
+  padding: "5px 14px",
+  borderRadius: 5,
+  border: "none",
+  backgroundColor: "transparent",
+  color: "#8E8E9A",
+  fontSize: 12,
+  fontWeight: 500,
+  cursor: "pointer",
+  transition: "all 0.12s ease",
+  fontFamily: "inherit",
+  whiteSpace: "nowrap",
+};
+
+const tabActiveStyle: CSSProperties = {
+  backgroundColor: "rgba(255, 255, 255, 0.08)",
+  color: "#F5F5F7",
+  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.15)",
+};
+
+const tabHoverStyle: CSSProperties = {
+  color: "#CCCCD0",
+};
+
+// Content area
+const contentStyle: CSSProperties = {
+  flex: 1,
+  overflow: "auto",
+  display: "flex",
+  justifyContent: "center",
+};
+
+const contentInnerStyle: CSSProperties = {
+  width: "100%",
+  maxWidth: 560,
+  padding: "28px 32px 48px",
+};
+
+// Save bar
+const saveBarStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  padding: "0 24px",
+  height: 44,
+  minHeight: 44,
+  borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+  backgroundColor: "rgba(14, 14, 18, 0.95)",
+  justifyContent: "flex-end",
+};
+
+const saveButtonStyle: CSSProperties = {
+  padding: "6px 16px",
+  borderRadius: 6,
+  border: "none",
+  backgroundColor: "#E53935",
+  color: "#FFFFFF",
+  fontSize: 12,
+  fontWeight: 600,
+  cursor: "pointer",
+  fontFamily: "inherit",
+  transition: "opacity 0.12s ease",
+};
+
+const versionStyle: CSSProperties = {
+  fontSize: 10,
+  color: "#55555F",
+  marginRight: "auto",
 };
 
 // --- Component ---
@@ -161,77 +174,49 @@ export function SettingsWindow() {
   };
 
   return (
-    <div style={styles.window}>
-      {/* Sidebar */}
-      <div style={styles.sidebar}>
-        <div style={styles.sidebarHeader}>Settings</div>
-        <div style={styles.tabList}>
+    <div style={windowStyle}>
+      {/* Toolbar */}
+      <div style={toolbarStyle}>
+        <span style={toolbarTitleStyle}>Settings</span>
+        <div style={tabBarStyle}>
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             const isHovered = hoveredTab === tab.id && !isActive;
-
             return (
               <button
                 key={tab.id}
                 style={{
-                  ...styles.tab,
-                  ...(isActive ? styles.tabActive : {}),
-                  ...(isHovered ? styles.tabHover : {}),
+                  ...tabStyle,
+                  ...(isActive ? tabActiveStyle : {}),
+                  ...(isHovered ? tabHoverStyle : {}),
                 }}
                 onClick={() => handleTabClick(tab.id)}
                 onMouseEnter={() => setHoveredTab(tab.id)}
                 onMouseLeave={() => setHoveredTab(null)}
               >
-                <span style={styles.tabIcon}>{tab.icon}</span>
                 {tab.label}
               </button>
             );
           })}
         </div>
-
-        {/* Save indicator */}
-        {hasUnsavedChanges && (
-          <div
-            style={{
-              margin: "auto 16px 0",
-              padding: "10px 12px",
-              borderRadius: 8,
-              backgroundColor: "rgba(229, 57, 53, 0.08)",
-              border: "1px solid rgba(229, 57, 53, 0.18)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <button
-              onClick={saveSettings}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#E53935",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-                fontFamily: "inherit",
-                padding: 0,
-              }}
-            >
-              Save Changes
-            </button>
-          </div>
-        )}
-
-        <div style={styles.versionBadge}>REDE v1.0.0</div>
       </div>
 
       {/* Content */}
-      <div style={styles.content}>
-        <h1 style={styles.contentHeader}>
-          {TABS.find((t) => t.id === activeTab)?.label}
-        </h1>
-        <p style={styles.contentSubheader}>{TAB_DESCRIPTIONS[activeTab]}</p>
-        {renderTabContent()}
+      <div style={contentStyle}>
+        <div style={contentInnerStyle}>
+          {renderTabContent()}
+        </div>
       </div>
+
+      {/* Save bar — only visible when there are unsaved changes */}
+      {hasUnsavedChanges && (
+        <div style={saveBarStyle}>
+          <span style={versionStyle}>REDE v1.0.0</span>
+          <button style={saveButtonStyle} onClick={saveSettings}>
+            Save Changes
+          </button>
+        </div>
+      )}
     </div>
   );
 }

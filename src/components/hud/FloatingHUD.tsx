@@ -1,6 +1,7 @@
 // ============================================================
 // REDE - Floating HUD Overlay Component
 // Stacked vertical layout: Capsule > Stats > Transcription > Correction
+// Position-aware — anchors to configurable screen position
 // ============================================================
 
 import React from "react";
@@ -8,7 +9,7 @@ import { useRecordingStore } from "../../stores/recordingStore";
 import { useSettingsStore } from "../../stores/settingsStore";
 import { HUDCapsule } from "./HUDCapsule";
 import { Equalizer } from "./Equalizer";
-import type { HudSize } from "../../types/index";
+import type { HudSize, HudPosition } from "../../types/index";
 
 // --- Brand Colors ---
 
@@ -17,7 +18,7 @@ const COLOR_SECONDARY = "#8E8E9A";
 const COLOR_TERTIARY = "#55555F";
 const COLOR_GREEN = "#4CAF50";
 const COLOR_GREEN_RGB = "76, 175, 80";
-const COLOR_BG_DARK = "rgba(12, 12, 16, 0.97)";
+const COLOR_BG_DARK = "rgba(12, 12, 16, 0.92)";
 const COLOR_BORDER = "rgba(255, 255, 255, 0.07)";
 
 // --- Keyframes ---
@@ -34,22 +35,43 @@ const hudKeyframes = `
 }
 `;
 
-// --- Styles ---
+// --- Position Logic ---
 
-const overlayStyle: React.CSSProperties = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  pointerEvents: "none",
-  zIndex: 9999,
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-};
+function getOverlayAlignment(position: HudPosition): React.CSSProperties {
+  const pad = 48;
+  const base: React.CSSProperties = {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    pointerEvents: "none",
+    zIndex: 9999,
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  };
+
+  switch (position) {
+    case "top-left":
+      return { ...base, justifyContent: "flex-start", alignItems: "flex-start", padding: pad };
+    case "top-center":
+      return { ...base, justifyContent: "flex-start", alignItems: "center", paddingTop: pad };
+    case "top-right":
+      return { ...base, justifyContent: "flex-start", alignItems: "flex-end", padding: pad };
+    case "center":
+      return { ...base, justifyContent: "center", alignItems: "center" };
+    case "bottom-left":
+      return { ...base, justifyContent: "flex-end", alignItems: "flex-start", padding: pad };
+    case "bottom-right":
+      return { ...base, justifyContent: "flex-end", alignItems: "flex-end", padding: pad };
+    case "bottom-center":
+    default:
+      return { ...base, justifyContent: "flex-end", alignItems: "center", paddingBottom: pad };
+  }
+}
+
+// --- Styles ---
 
 const stackContainerStyle: React.CSSProperties = {
   display: "flex",
@@ -64,48 +86,48 @@ const equalizerContainerSizes: Record<HudSize, React.CSSProperties> = {
   immersive: { width: 72, height: 52, flexShrink: 0 },
 };
 
-// Stats pill
 const statsPillStyle: React.CSSProperties = {
-  marginTop: 12,
-  padding: "6px 16px",
+  marginTop: 10,
+  padding: "5px 14px",
   borderRadius: 20,
   backgroundColor: COLOR_BG_DARK,
   border: `1px solid ${COLOR_BORDER}`,
-  fontSize: 12,
+  fontSize: 11,
   fontWeight: 500,
   color: COLOR_SECONDARY,
   letterSpacing: 0.3,
   whiteSpace: "nowrap",
   backdropFilter: "blur(16px)",
   WebkitBackdropFilter: "blur(16px)",
-  transition: "opacity 200ms ease, transform 200ms ease",
 };
 
-// Transcription bubble
 const transcriptionBubbleStyle: React.CSSProperties = {
-  marginTop: 12,
-  padding: "12px 20px",
-  borderRadius: 16,
+  marginTop: 10,
+  padding: "10px 16px",
+  borderRadius: 14,
   backgroundColor: COLOR_BG_DARK,
   border: `1px solid ${COLOR_BORDER}`,
-  minWidth: 200,
-  maxWidth: 360,
-  fontSize: 14,
+  minWidth: 160,
+  maxWidth: 320,
+  fontSize: 13,
   fontWeight: 400,
   color: COLOR_PRIMARY,
-  lineHeight: "20px",
+  lineHeight: "18px",
   textAlign: "center",
   backdropFilter: "blur(16px)",
   WebkitBackdropFilter: "blur(16px)",
-  transition: "opacity 200ms ease",
   wordBreak: "break-word",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: 3,
+  WebkitBoxOrient: "vertical" as never,
 };
 
-// Blinking cursor
 const cursorStyle: React.CSSProperties = {
   display: "inline-block",
   width: 2,
-  height: 16,
+  height: 14,
   backgroundColor: COLOR_PRIMARY,
   marginLeft: 2,
   verticalAlign: "text-bottom",
@@ -113,44 +135,27 @@ const cursorStyle: React.CSSProperties = {
   animation: "rede-cursor-blink 1s ease-in-out infinite",
 };
 
-// Correction badge
-const correctionBadgeStyle: React.CSSProperties = {
+// Correction — compact pill, not full-width
+const correctionPillStyle: React.CSSProperties = {
   marginTop: 8,
-  padding: "8px 16px",
-  borderRadius: 12,
-  backgroundColor: `rgba(${COLOR_GREEN_RGB}, 0.15)`,
-  border: `1px solid rgba(${COLOR_GREEN_RGB}, 0.3)`,
-  fontSize: 13,
-  fontWeight: 400,
-  color: COLOR_PRIMARY,
-  lineHeight: "18px",
+  padding: "6px 14px",
+  borderRadius: 10,
+  backgroundColor: `rgba(${COLOR_GREEN_RGB}, 0.12)`,
+  border: `1px solid rgba(${COLOR_GREEN_RGB}, 0.25)`,
+  fontSize: 11,
+  fontWeight: 500,
+  color: COLOR_GREEN,
+  lineHeight: "16px",
   textAlign: "center",
   animation: "rede-correction-fadein 300ms ease-out",
   backdropFilter: "blur(16px)",
   WebkitBackdropFilter: "blur(16px)",
-  display: "flex",
+  display: "inline-flex",
   alignItems: "center",
-  justifyContent: "center",
   gap: 6,
+  maxWidth: 280,
   whiteSpace: "nowrap",
-};
-
-const strikethroughStyle: React.CSSProperties = {
-  textDecoration: "line-through",
-  color: COLOR_TERTIARY,
-  opacity: 0.7,
-};
-
-const arrowStyle: React.CSSProperties = {
-  color: COLOR_GREEN,
-  fontWeight: 500,
-  fontSize: 13,
-  margin: "0 2px",
-};
-
-const correctedTextStyle: React.CSSProperties = {
-  color: COLOR_GREEN,
-  fontWeight: 500,
+  overflow: "hidden",
 };
 
 // --- Helpers ---
@@ -162,6 +167,11 @@ function formatDuration(ms: number): string {
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
+function truncate(text: string, max: number): string {
+  if (text.length <= max) return text;
+  return text.slice(0, max - 1) + "\u2026";
+}
+
 // --- Component ---
 
 export const FloatingHUD: React.FC = () => {
@@ -170,9 +180,10 @@ export const FloatingHUD: React.FC = () => {
   const duration = useRecordingStore((s) => s.duration);
   const transcription = useRecordingStore((s) => s.transcription);
   const wordCount = useRecordingStore((s) => s.wordCount);
-  const correction = useRecordingStore((s) => (s as any).correction as { original: string; corrected: string } | null);
+  const correction = useRecordingStore((s) => s.correction);
 
   const hudSize = useSettingsStore((s) => s.settings.hud_size);
+  const hudPosition = useSettingsStore((s) => s.settings.hud_position);
   const showGlow = useSettingsStore((s) => s.settings.show_glow);
   const showStats = useSettingsStore((s) => s.settings.show_stats);
 
@@ -182,7 +193,6 @@ export const FloatingHUD: React.FC = () => {
 
   const barCount = hudSize === "compact" ? 4 : hudSize === "balanced" ? 5 : 7;
 
-  // Normalize audio levels to match barCount
   const equalizerLevels = React.useMemo(() => {
     if (audioLevels.length >= barCount) {
       return audioLevels.slice(0, barCount);
@@ -201,19 +211,16 @@ export const FloatingHUD: React.FC = () => {
     return new Array(barCount).fill(0);
   }, [audioLevels, barCount]);
 
-  // Determine display text for transcription bubble
   const displayText = React.useMemo(() => {
-    if (isRecording) return "Listening...";
-    if (isProcessing) return "Processing...";
+    if (isRecording) return "Listening\u2026";
+    if (isProcessing) return "Processing\u2026";
     if (transcription) return transcription;
     return "";
   }, [transcription, isProcessing, isRecording]);
 
-  // Show cursor when processing (typing animation)
   const showCursor = isProcessing;
-
-  // Show transcription bubble when there is something to display
   const showTranscription = isRecording || isProcessing || !!transcription;
+  const overlayStyle = getOverlayAlignment(hudPosition);
 
   return (
     <>
@@ -241,7 +248,7 @@ export const FloatingHUD: React.FC = () => {
           {showStats && isActive && (
             <div style={statsPillStyle}>
               {formatDuration(duration)}
-              <span style={{ margin: "0 8px", color: COLOR_TERTIARY }}>|</span>
+              <span style={{ margin: "0 6px", color: COLOR_TERTIARY }}>|</span>
               {wordCount} {wordCount === 1 ? "word" : "words"}
             </div>
           )}
@@ -254,12 +261,17 @@ export const FloatingHUD: React.FC = () => {
             </div>
           )}
 
-          {/* 4. Smart Correction badge */}
+          {/* 4. Smart Correction — compact pill */}
           {correction && (
-            <div style={correctionBadgeStyle}>
-              <span style={strikethroughStyle}>{correction.original}</span>
-              <span style={arrowStyle}>{"\u2192"}</span>
-              <span style={correctedTextStyle}>{correction.corrected}</span>
+            <div style={correctionPillStyle}>
+              <span style={{ fontWeight: 600 }}>Corrected</span>
+              <span style={{ color: COLOR_TERTIARY, textDecoration: "line-through", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {truncate(correction.original, 20)}
+              </span>
+              <span style={{ color: COLOR_GREEN }}>{"\u2192"}</span>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+                {truncate(correction.corrected, 24)}
+              </span>
             </div>
           )}
 
