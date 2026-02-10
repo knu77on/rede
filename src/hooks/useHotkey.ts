@@ -1,18 +1,14 @@
 // ============================================================
 // REDE - Hotkey Events Hook
+// Dynamically imports Tauri API so it works in browser too.
 // ============================================================
 
 import { useState, useEffect } from "react";
-import { listen } from "@tauri-apps/api/event";
 import { useRecordingStore } from "../stores/recordingStore";
-
-// --- Types ---
 
 interface UseHotkeyResult {
   isHotkeyPressed: boolean;
 }
-
-// --- Hook ---
 
 export function useHotkey(): UseHotkeyResult {
   const [isHotkeyPressed, setIsHotkeyPressed] = useState(false);
@@ -26,34 +22,33 @@ export function useHotkey(): UseHotkeyResult {
     const unlisteners: Array<() => void> = [];
 
     async function setupListeners() {
-      // Listen for hotkey press
-      const unlistenPressed = await listen("hotkey-pressed", () => {
-        setIsHotkeyPressed(true);
+      try {
+        const { listen } = await import("@tauri-apps/api/event");
 
-        // Start recording if currently idle
-        if (recordingState === "idle" || recordingState === "error") {
-          startRecording();
-        }
-      });
-      unlisteners.push(unlistenPressed);
+        const unlistenPressed = await listen("hotkey-pressed", () => {
+          setIsHotkeyPressed(true);
+          if (recordingState === "idle" || recordingState === "error") {
+            startRecording();
+          }
+        });
+        unlisteners.push(unlistenPressed);
 
-      // Listen for hotkey release
-      const unlistenReleased = await listen("hotkey-released", () => {
-        setIsHotkeyPressed(false);
+        const unlistenReleased = await listen("hotkey-released", () => {
+          setIsHotkeyPressed(false);
+          if (recordingState === "recording") {
+            stopRecording();
+          }
+        });
+        unlisteners.push(unlistenReleased);
 
-        // Stop recording if currently recording
-        if (recordingState === "recording") {
-          stopRecording();
-        }
-      });
-      unlisteners.push(unlistenReleased);
-
-      // Listen for recording cancellation
-      const unlistenCancelled = await listen("recording-cancelled", () => {
-        setIsHotkeyPressed(false);
-        cancelRecording();
-      });
-      unlisteners.push(unlistenCancelled);
+        const unlistenCancelled = await listen("recording-cancelled", () => {
+          setIsHotkeyPressed(false);
+          cancelRecording();
+        });
+        unlisteners.push(unlistenCancelled);
+      } catch {
+        // Not running inside Tauri — hotkeys unavailable in browser mode
+      }
     }
 
     setupListeners();
