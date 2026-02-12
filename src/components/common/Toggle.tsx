@@ -38,16 +38,16 @@ const styles: Record<string, CSSProperties> = {
     minWidth: 0,
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 500,
-    color: "#FFFFFF",
-    lineHeight: "20px",
+    color: "#F5F5F7",
+    lineHeight: "18px",
   },
   description: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 400,
-    color: "#A0A0B0",
-    lineHeight: "16px",
+    color: "#8E8E9A",
+    lineHeight: "15px",
   },
   track: {
     position: "relative",

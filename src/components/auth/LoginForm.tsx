@@ -1,5 +1,6 @@
 // ============================================================
 // REDE - Login Form Component
+// macOS dark glass aesthetic
 // ============================================================
 
 import React from "react";
@@ -15,6 +16,10 @@ interface LoginFormProps {
   error?: string | null;
 }
 
+// --- Constants ---
+
+const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
 // --- Styles ---
 
 const formStyle: React.CSSProperties = {
@@ -25,9 +30,10 @@ const formStyle: React.CSSProperties = {
 };
 
 const forgotLinkStyle: React.CSSProperties = {
-  fontSize: 13,
+  fontSize: 12,
   color: "#E53935",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: FONT,
+  fontWeight: 500,
   background: "none",
   border: "none",
   cursor: "pointer",
@@ -38,12 +44,13 @@ const forgotLinkStyle: React.CSSProperties = {
 
 const errorBannerStyle: React.CSSProperties = {
   padding: "10px 14px",
-  backgroundColor: "rgba(248, 113, 113, 0.1)",
-  border: "1px solid rgba(248, 113, 113, 0.2)",
+  backgroundColor: "rgba(248, 113, 113, 0.08)",
+  border: "1px solid rgba(248, 113, 113, 0.15)",
   borderRadius: 8,
-  fontSize: 13,
+  fontSize: 12,
   color: "#F87171",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: FONT,
+  lineHeight: "17px",
 };
 
 // --- Validation ---
@@ -142,7 +149,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             type="button"
             style={{
               ...forgotLinkStyle,
-              opacity: forgotHovered ? 0.8 : 1,
+              opacity: forgotHovered ? 0.7 : 1,
             }}
             onClick={onForgotPassword}
             onMouseEnter={() => setForgotHovered(true)}

@@ -1,5 +1,6 @@
 // ============================================================
 // REDE - Reusable Button Component
+// macOS dark glass aesthetic
 // ============================================================
 
 import React from "react";
@@ -18,11 +19,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
-// --- Styles ---
+// --- Constants ---
 
+const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 const ACCENT = "#E53935";
 const ACCENT_HOVER = "#EF5350";
 const ACCENT_ACTIVE = "#C62828";
+
+// --- Styles ---
 
 const baseStyle: React.CSSProperties = {
   display: "inline-flex",
@@ -31,10 +35,10 @@ const baseStyle: React.CSSProperties = {
   gap: 8,
   border: "none",
   borderRadius: 8,
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: FONT,
   fontWeight: 500,
   cursor: "pointer",
-  transition: "all 150ms ease",
+  transition: "all 120ms ease",
   outline: "none",
   position: "relative",
   whiteSpace: "nowrap",
@@ -45,51 +49,55 @@ const variantStyles: Record<ButtonVariant, React.CSSProperties> = {
   primary: {
     backgroundColor: ACCENT,
     color: "#FFFFFF",
+    boxShadow: "0 2px 8px rgba(229, 57, 53, 0.25)",
   },
   secondary: {
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-    color: "#FFFFFF",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    color: "#F5F5F7",
     border: "1px solid rgba(255, 255, 255, 0.08)",
   },
   ghost: {
     backgroundColor: "transparent",
-    color: "#A0A0B0",
+    color: "#8E8E9A",
   },
   danger: {
-    backgroundColor: "rgba(248, 113, 113, 0.12)",
+    backgroundColor: "rgba(248, 113, 113, 0.1)",
     color: "#F87171",
+    border: "1px solid rgba(248, 113, 113, 0.15)",
   },
 };
 
 const variantHoverStyles: Record<ButtonVariant, React.CSSProperties> = {
   primary: {
     backgroundColor: ACCENT_HOVER,
+    boxShadow: "0 4px 12px rgba(229, 57, 53, 0.3)",
   },
   secondary: {
-    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    backgroundColor: "rgba(255, 255, 255, 0.08)",
     borderColor: "rgba(255, 255, 255, 0.12)",
   },
   ghost: {
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
-    color: "#FFFFFF",
+    backgroundColor: "rgba(255, 255, 255, 0.04)",
+    color: "#F5F5F7",
   },
   danger: {
-    backgroundColor: "rgba(248, 113, 113, 0.2)",
+    backgroundColor: "rgba(248, 113, 113, 0.18)",
   },
 };
 
 const variantActiveStyles: Record<ButtonVariant, React.CSSProperties> = {
   primary: {
     backgroundColor: ACCENT_ACTIVE,
+    boxShadow: "0 1px 4px rgba(229, 57, 53, 0.2)",
   },
   secondary: {
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
-  },
-  ghost: {
     backgroundColor: "rgba(255, 255, 255, 0.04)",
   },
+  ghost: {
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+  },
   danger: {
-    backgroundColor: "rgba(248, 113, 113, 0.25)",
+    backgroundColor: "rgba(248, 113, 113, 0.24)",
   },
 };
 
@@ -102,14 +110,14 @@ const sizeStyles: Record<ButtonSize, React.CSSProperties> = {
   },
   md: {
     padding: "10px 18px",
-    fontSize: 14,
-    lineHeight: "20px",
+    fontSize: 13,
+    lineHeight: "18px",
     borderRadius: 8,
   },
   lg: {
-    padding: "14px 24px",
-    fontSize: 16,
-    lineHeight: "24px",
+    padding: "12px 24px",
+    fontSize: 14,
+    lineHeight: "20px",
     borderRadius: 10,
   },
 };

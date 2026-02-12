@@ -1,5 +1,6 @@
 // ============================================================
 // REDE - Registration Form Component
+// macOS dark glass aesthetic
 // ============================================================
 
 import React from "react";
@@ -14,6 +15,10 @@ interface RegisterFormProps {
   error?: string | null;
 }
 
+// --- Constants ---
+
+const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
 // --- Styles ---
 
 const formStyle: React.CSSProperties = {
@@ -25,12 +30,13 @@ const formStyle: React.CSSProperties = {
 
 const errorBannerStyle: React.CSSProperties = {
   padding: "10px 14px",
-  backgroundColor: "rgba(248, 113, 113, 0.1)",
-  border: "1px solid rgba(248, 113, 113, 0.2)",
+  backgroundColor: "rgba(248, 113, 113, 0.08)",
+  border: "1px solid rgba(248, 113, 113, 0.15)",
   borderRadius: 8,
-  fontSize: 13,
+  fontSize: 12,
   color: "#F87171",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: FONT,
+  lineHeight: "17px",
 };
 
 const strengthContainerStyle: React.CSSProperties = {
@@ -42,31 +48,31 @@ const strengthContainerStyle: React.CSSProperties = {
 const strengthBarTrackStyle: React.CSSProperties = {
   display: "flex",
   gap: 4,
-  height: 4,
+  height: 3,
 };
 
 const strengthSegmentBaseStyle: React.CSSProperties = {
   flex: 1,
   height: "100%",
   borderRadius: 2,
-  backgroundColor: "rgba(255, 255, 255, 0.08)",
+  backgroundColor: "rgba(255, 255, 255, 0.06)",
   transition: "background-color 200ms ease",
 };
 
 const strengthLabelStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 500,
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: FONT,
   lineHeight: "14px",
   transition: "color 200ms ease",
 };
 
 const termsTextStyle: React.CSSProperties = {
-  fontSize: 12,
-  color: "#606070",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontSize: 11,
+  color: "#55555F",
+  fontFamily: FONT,
   textAlign: "center",
-  lineHeight: "18px",
+  lineHeight: "16px",
 };
 
 const termsLinkStyle: React.CSSProperties = {
@@ -78,26 +84,20 @@ const termsLinkStyle: React.CSSProperties = {
 // --- Password Strength ---
 
 interface StrengthResult {
-  score: number; // 0-4
+  score: number;
   label: string;
   color: string;
 }
 
 function computePasswordStrength(password: string): StrengthResult {
-  if (!password) return { score: 0, label: "", color: "#606070" };
+  if (!password) return { score: 0, label: "", color: "#55555F" };
 
   let score = 0;
-
-  // Length checks
   if (password.length >= 8) score++;
   if (password.length >= 12) score++;
-
-  // Character variety
   if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
   if (/\d/.test(password)) score++;
   if (/[^a-zA-Z0-9]/.test(password)) score++;
-
-  // Cap at 4
   score = Math.min(4, score);
 
   const levels: Record<number, { label: string; color: string }> = {
@@ -235,7 +235,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           autoComplete="new-password"
         />
 
-        {/* Password strength indicator */}
         {password.length > 0 && (
           <>
             <div style={strengthBarTrackStyle}>
@@ -247,7 +246,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                     backgroundColor:
                       segment < strength.score
                         ? strength.color
-                        : "rgba(255, 255, 255, 0.08)",
+                        : "rgba(255, 255, 255, 0.06)",
                   }}
                 />
               ))}

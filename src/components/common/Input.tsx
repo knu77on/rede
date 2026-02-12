@@ -1,5 +1,6 @@
 // ============================================================
 // REDE - Reusable Input Component
+// macOS dark glass aesthetic
 // ============================================================
 
 import React from "react";
@@ -20,10 +21,13 @@ interface InputProps {
   name?: string;
 }
 
-// --- Styles ---
+// --- Constants ---
 
+const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 const ACCENT = "#E53935";
 const ERROR_COLOR = "#F87171";
+
+// --- Styles ---
 
 const wrapperStyle: React.CSSProperties = {
   display: "flex",
@@ -33,10 +37,10 @@ const wrapperStyle: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 13,
+  fontSize: 12,
   fontWeight: 500,
-  color: "#A0A0B0",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  color: "#8E8E9A",
+  fontFamily: FONT,
   userSelect: "none",
 };
 
@@ -45,9 +49,9 @@ const baseInputStyle: React.CSSProperties = {
   padding: "10px 14px",
   fontSize: 14,
   lineHeight: "20px",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  color: "#FFFFFF",
-  backgroundColor: "rgba(255, 255, 255, 0.06)",
+  fontFamily: FONT,
+  color: "#F5F5F7",
+  backgroundColor: "rgba(255, 255, 255, 0.04)",
   border: "1px solid rgba(255, 255, 255, 0.08)",
   borderRadius: 8,
   outline: "none",
@@ -55,23 +59,12 @@ const baseInputStyle: React.CSSProperties = {
   boxSizing: "border-box",
 };
 
-const focusedBorderColor = ACCENT;
-
-const errorInputOverride: React.CSSProperties = {
-  borderColor: ERROR_COLOR,
-};
-
 const errorTextStyle: React.CSSProperties = {
-  fontSize: 12,
+  fontSize: 11,
   fontWeight: 400,
   color: ERROR_COLOR,
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: FONT,
   marginTop: 2,
-};
-
-const disabledStyle: React.CSSProperties = {
-  opacity: 0.4,
-  cursor: "not-allowed",
 };
 
 // --- Component ---
@@ -97,14 +90,14 @@ export const Input: React.FC<InputProps> = ({
     ...baseInputStyle,
     ...(focused
       ? {
-          borderColor: error ? ERROR_COLOR : focusedBorderColor,
+          borderColor: error ? ERROR_COLOR : ACCENT,
           boxShadow: error
-            ? `0 0 0 3px rgba(248, 113, 113, 0.15)`
-            : `0 0 0 3px rgba(229, 57, 53, 0.15)`,
+            ? "0 0 0 3px rgba(248, 113, 113, 0.12)"
+            : "0 0 0 3px rgba(229, 57, 53, 0.12)",
         }
       : {}),
-    ...(error && !focused ? errorInputOverride : {}),
-    ...(disabled ? disabledStyle : {}),
+    ...(error && !focused ? { borderColor: ERROR_COLOR } : {}),
+    ...(disabled ? { opacity: 0.4, cursor: "not-allowed" } : {}),
   };
 
   return (

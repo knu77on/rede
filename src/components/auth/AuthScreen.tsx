@@ -1,5 +1,6 @@
 // ============================================================
 // REDE - Main Authentication Screen
+// macOS dark glass aesthetic
 // ============================================================
 
 import React from "react";
@@ -12,6 +13,10 @@ import { Button } from "../common/Button";
 
 type AuthTab = "login" | "register";
 
+// --- Font ---
+
+const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
 // --- Styles ---
 
 const screenStyle: React.CSSProperties = {
@@ -20,37 +25,44 @@ const screenStyle: React.CSSProperties = {
   justifyContent: "center",
   minHeight: "100vh",
   width: "100%",
-  backgroundColor: "rgba(18, 18, 22, 0.95)",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  backgroundColor: "#08080C",
+  fontFamily: FONT,
   padding: 24,
   boxSizing: "border-box",
 };
 
 const cardStyle: React.CSSProperties = {
   width: "100%",
-  maxWidth: 400,
+  maxWidth: 420,
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  gap: 32,
+  gap: 24,
+  padding: "36px 32px 32px",
+  borderRadius: 16,
+  backgroundColor: "rgba(18, 18, 24, 0.85)",
+  border: "1px solid rgba(255, 255, 255, 0.06)",
+  backdropFilter: "blur(40px) saturate(1.4)",
+  WebkitBackdropFilter: "blur(40px) saturate(1.4)",
+  boxShadow: "0 24px 80px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.05) inset",
 };
 
 const brandingStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  gap: 12,
+  gap: 8,
 };
 
 const logoStyle: React.CSSProperties = {
-  width: 56,
-  height: 56,
-  borderRadius: 14,
+  width: 52,
+  height: 52,
+  borderRadius: 13,
   backgroundColor: "#E53935",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  boxShadow: "0 4px 24px rgba(229, 57, 53, 0.3)",
+  boxShadow: "0 4px 20px rgba(229, 57, 53, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06) inset",
 };
 
 const logoTextStyle: React.CSSProperties = {
@@ -58,56 +70,60 @@ const logoTextStyle: React.CSSProperties = {
   fontWeight: 700,
   color: "#FFFFFF",
   letterSpacing: -0.5,
+  fontFamily: FONT,
 };
 
 const appNameStyle: React.CSSProperties = {
-  fontSize: 28,
+  fontSize: 24,
   fontWeight: 700,
-  color: "#FFFFFF",
-  letterSpacing: -0.5,
+  color: "#F5F5F7",
+  letterSpacing: "-0.02em",
   margin: 0,
+  fontFamily: FONT,
 };
 
 const taglineStyle: React.CSSProperties = {
-  fontSize: 14,
-  color: "#A0A0B0",
+  fontSize: 13,
+  color: "#8E8E9A",
   textAlign: "center",
-  lineHeight: "20px",
+  lineHeight: "18px",
   margin: 0,
+  fontFamily: FONT,
 };
 
 const tabBarStyle: React.CSSProperties = {
   display: "flex",
   width: "100%",
   backgroundColor: "rgba(255, 255, 255, 0.04)",
-  borderRadius: 10,
-  padding: 3,
+  borderRadius: 8,
+  padding: 2,
 };
 
-const tabStyle: React.CSSProperties = {
+const tabBaseStyle: React.CSSProperties = {
   flex: 1,
-  padding: "10px 0",
-  fontSize: 14,
+  padding: "8px 0",
+  fontSize: 13,
   fontWeight: 500,
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: FONT,
   border: "none",
-  borderRadius: 8,
+  borderRadius: 6,
   cursor: "pointer",
-  transition: "all 150ms ease",
+  transition: "all 120ms ease",
   textAlign: "center",
   userSelect: "none",
 };
 
 const activeTabStyle: React.CSSProperties = {
-  ...tabStyle,
+  ...tabBaseStyle,
   backgroundColor: "rgba(255, 255, 255, 0.08)",
-  color: "#FFFFFF",
+  color: "#F5F5F7",
+  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
 };
 
 const inactiveTabStyle: React.CSSProperties = {
-  ...tabStyle,
+  ...tabBaseStyle,
   backgroundColor: "transparent",
-  color: "#606070",
+  color: "#55555F",
 };
 
 const formContainerStyle: React.CSSProperties = {
@@ -118,20 +134,19 @@ const dividerContainerStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 12,
-  margin: "4px 0",
   width: "100%",
 };
 
 const dividerLineStyle: React.CSSProperties = {
   flex: 1,
   height: 1,
-  backgroundColor: "rgba(255, 255, 255, 0.08)",
+  backgroundColor: "rgba(255, 255, 255, 0.06)",
 };
 
 const dividerTextStyle: React.CSSProperties = {
-  fontSize: 12,
-  color: "#606070",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontSize: 11,
+  color: "#55555F",
+  fontFamily: FONT,
   whiteSpace: "nowrap",
   userSelect: "none",
 };
@@ -174,10 +189,7 @@ export const AuthScreen: React.FC = () => {
   const getTabStyle = (tab: AuthTab): React.CSSProperties => {
     if (tab === activeTab) return activeTabStyle;
     if (tab === hoveredTab) {
-      return {
-        ...inactiveTabStyle,
-        color: "#A0A0B0",
-      };
+      return { ...inactiveTabStyle, color: "#8E8E9A" };
     }
     return inactiveTabStyle;
   };
