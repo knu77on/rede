@@ -1,6 +1,6 @@
 // ============================================================
 // REDE - Settings Window
-// macOS System Settings–inspired layout with centered toolbar
+// Uses shared WindowShell with tabs in toolbar area
 // ============================================================
 
 import { type CSSProperties, useState, useCallback } from "react";
@@ -9,6 +9,7 @@ import { VoiceTab } from "./tabs/VoiceTab";
 import { ProcessingTab } from "./tabs/ProcessingTab";
 import { PrivacyTab } from "./tabs/PrivacyTab";
 import { AccountTab } from "./tabs/AccountTab";
+import { WindowShell } from "../common/WindowShell";
 
 interface SettingsWindowProps {
   onClose?: () => void;
@@ -35,48 +36,6 @@ const TABS: TabDef[] = [
 
 // --- Styles ---
 
-const windowStyle: CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  width: "100%",
-  height: "100vh",
-  backgroundColor: "#0E0E12",
-  color: "#F5F5F7",
-  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  overflow: "hidden",
-};
-
-// Toolbar — tab bar aligned with content column
-const toolbarStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: "0 24px",
-  height: 52,
-  minHeight: 52,
-  borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
-  backgroundColor: "rgba(14, 14, 18, 0.95)",
-  backdropFilter: "blur(20px)",
-  WebkitBackdropFilter: "blur(20px)",
-  userSelect: "none",
-};
-
-// Inner container matches content max-width for alignment
-const toolbarInnerStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  width: "100%",
-  maxWidth: 560,
-};
-
-const toolbarTitleStyle: CSSProperties = {
-  fontSize: 13,
-  fontWeight: 600,
-  color: "#F5F5F7",
-  letterSpacing: "-0.01em",
-};
-
 const tabBarStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
@@ -101,49 +60,25 @@ const tabStyle: CSSProperties = {
 };
 
 const tabActiveStyle: CSSProperties = {
-  backgroundColor: "rgba(255, 255, 255, 0.08)",
+  backgroundColor: "rgba(255, 255, 255, 0.07)",
   color: "#F5F5F7",
-  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.15)",
+  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.15)",
 };
 
 const tabHoverStyle: CSSProperties = {
   color: "#CCCCD0",
 };
 
-const contentStyle: CSSProperties = {
-  flex: 1,
-  overflow: "auto",
-  display: "flex",
-  justifyContent: "center",
-};
-
 const contentInnerStyle: CSSProperties = {
   width: "100%",
   maxWidth: 560,
+  margin: "0 auto",
   padding: "28px 32px 48px",
 };
 
 // --- Component ---
 
-const closeButtonStyle: CSSProperties = {
-  width: 28,
-  height: 28,
-  borderRadius: 6,
-  border: "1px solid rgba(255, 255, 255, 0.08)",
-  backgroundColor: "rgba(255, 255, 255, 0.04)",
-  color: "#8E8E9A",
-  fontSize: 15,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "pointer",
-  transition: "all 0.12s ease",
-  fontFamily: "inherit",
-  padding: 0,
-  flexShrink: 0,
-};
-
-export function SettingsWindow({ onClose }: SettingsWindowProps = {}) {
+export function SettingsWindow(_props: SettingsWindowProps = {}) {
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [hoveredTab, setHoveredTab] = useState<TabId | null>(null);
 
@@ -153,76 +88,44 @@ export function SettingsWindow({ onClose }: SettingsWindowProps = {}) {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case "general":
-        return <GeneralTab />;
-      case "voice":
-        return <VoiceTab />;
-      case "processing":
-        return <ProcessingTab />;
-      case "privacy":
-        return <PrivacyTab />;
-      case "account":
-        return <AccountTab />;
-      default:
-        return null;
+      case "general": return <GeneralTab />;
+      case "voice": return <VoiceTab />;
+      case "processing": return <ProcessingTab />;
+      case "privacy": return <PrivacyTab />;
+      case "account": return <AccountTab />;
+      default: return null;
     }
   };
 
-  return (
-    <div style={windowStyle}>
-      {/* Toolbar — title and tabs aligned with content column */}
-      <div style={toolbarStyle}>
-        <div style={toolbarInnerStyle}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {onClose && (
-              <button
-                style={closeButtonStyle}
-                onClick={onClose}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.08)";
-                  e.currentTarget.style.color = "#F5F5F7";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.04)";
-                  e.currentTarget.style.color = "#8E8E9A";
-                }}
-                title="Close settings"
-              >
-                {"\u2190"}
-              </button>
-            )}
-            <span style={toolbarTitleStyle}>Settings</span>
-          </div>
-          <div style={tabBarStyle}>
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
-              const isHovered = hoveredTab === tab.id && !isActive;
-              return (
-                <button
-                  key={tab.id}
-                  style={{
-                    ...tabStyle,
-                    ...(isActive ? tabActiveStyle : {}),
-                    ...(isHovered ? tabHoverStyle : {}),
-                  }}
-                  onClick={() => handleTabClick(tab.id)}
-                  onMouseEnter={() => setHoveredTab(tab.id)}
-                  onMouseLeave={() => setHoveredTab(null)}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div style={contentStyle}>
-        <div style={contentInnerStyle}>
-          {renderTabContent()}
-        </div>
-      </div>
+  const tabBarElement = (
+    <div style={tabBarStyle}>
+      {TABS.map((tab) => {
+        const isActive = activeTab === tab.id;
+        const isHovered = hoveredTab === tab.id && !isActive;
+        return (
+          <button
+            key={tab.id}
+            style={{
+              ...tabStyle,
+              ...(isActive ? tabActiveStyle : {}),
+              ...(isHovered ? tabHoverStyle : {}),
+            }}
+            onClick={() => handleTabClick(tab.id)}
+            onMouseEnter={() => setHoveredTab(tab.id)}
+            onMouseLeave={() => setHoveredTab(null)}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
     </div>
+  );
+
+  return (
+    <WindowShell title="Settings" toolbar={tabBarElement}>
+      <div style={contentInnerStyle}>
+        {renderTabContent()}
+      </div>
+    </WindowShell>
   );
 }

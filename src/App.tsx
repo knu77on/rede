@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { FloatingHUD } from "./components/hud/FloatingHUD";
 import { SettingsWindow } from "./components/settings/SettingsWindow";
 import { AuthScreen } from "./components/auth/AuthScreen";
+import { WindowShell } from "./components/common/WindowShell";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useAuthStore } from "./stores/authStore";
 import { useRecordingStore } from "./stores/recordingStore";
@@ -62,7 +63,6 @@ function useDictationHistory() {
     if (!transcription || transcription === lastTextRef.current) return;
     lastTextRef.current = transcription;
 
-    // Small delay to let correction arrive
     const timer = setTimeout(() => {
       const currentCorrection = useRecordingStore.getState().correction;
       addEntry({
@@ -95,13 +95,10 @@ function useHudVisibility() {
       if (e.key !== "Control") return;
 
       if (activationMode === "push") {
-        // Hold Control = show
         show();
       } else {
-        // Toggle mode: double-press Control
         const now = Date.now();
         if (now - lastControlRef.current < 400) {
-          // Double press detected
           setVisible((prev) => !prev);
           lastControlRef.current = 0;
         } else {
@@ -113,7 +110,6 @@ function useHudVisibility() {
     function handleKeyUp(e: KeyboardEvent) {
       if (e.key !== "Control") return;
       if (activationMode === "push") {
-        // Release Control = hide (after a grace period for results to show)
         if (controlTimerRef.current) clearTimeout(controlTimerRef.current);
         controlTimerRef.current = setTimeout(hide, 200);
       }
@@ -129,7 +125,6 @@ function useHudVisibility() {
     };
   }, [activationMode, show, hide]);
 
-  // Also show when recording state changes (recording/processing/transcription)
   const recordingState = useRecordingStore((s) => s.state);
   const transcription = useRecordingStore((s) => s.transcription);
 
@@ -139,7 +134,6 @@ function useHudVisibility() {
     }
   }, [recordingState, show]);
 
-  // Keep visible briefly after transcription appears, then fade out
   useEffect(() => {
     if (!transcription) return;
     show();
@@ -210,35 +204,40 @@ function HudWithVisibility({ alwaysVisible }: { alwaysVisible?: boolean }) {
   );
 }
 
-/** Wraps the HUD with a visible background and navigation for demo/dev */
+// --- Demo Shell ---
+
+const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
 function DemoShell({ onOpenSettings }: { onOpenSettings: () => void }) {
   const demo = isDemoMode();
   const [showNav, setShowNav] = useState(true);
 
   if (!demo) {
-    return <HudWithVisibility />;
+    return (
+      <WindowShell transparent>
+        <HudWithVisibility />
+      </WindowShell>
+    );
   }
 
   return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        backgroundColor: "#08080C",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily:
-          '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        gap: 32,
-      }}
-    >
-      {showNav && <DemoBanner onClose={() => setShowNav(false)} />}
-      {/* In demo mode, HUD is always visible so you can see it */}
-      <HudWithVisibility alwaysVisible />
-      {showNav && <DemoNav onOpenSettings={onOpenSettings} />}
-    </div>
+    <WindowShell title="REDE" scrollable={false}>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 32,
+          fontFamily: FONT,
+        }}
+      >
+        {showNav && <DemoBanner onClose={() => setShowNav(false)} />}
+        <HudWithVisibility alwaysVisible />
+        {showNav && <DemoNav onOpenSettings={onOpenSettings} />}
+      </div>
+    </WindowShell>
   );
 }
 
@@ -249,18 +248,17 @@ function DemoBanner({ onClose }: { onClose: () => void }) {
         display: "flex",
         alignItems: "center",
         gap: 12,
-        padding: "10px 20px",
-        borderRadius: 10,
-        backgroundColor: "rgba(229, 57, 53, 0.08)",
-        border: "1px solid rgba(229, 57, 53, 0.2)",
+        padding: "8px 16px",
+        borderRadius: 8,
+        backgroundColor: "rgba(229, 57, 53, 0.06)",
+        border: "1px solid rgba(229, 57, 53, 0.15)",
         color: "#E53935",
-        fontSize: 13,
-        fontFamily:
-          '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontSize: 12,
+        fontFamily: FONT,
       }}
     >
       <span style={{ fontWeight: 600 }}>DEMO MODE</span>
-      <span style={{ color: "#8E8E9A" }}>
+      <span style={{ color: "#6E6E7A" }}>
         Simulated recording &mdash; no microphone or APIs needed
       </span>
       <button
@@ -270,8 +268,8 @@ function DemoBanner({ onClose }: { onClose: () => void }) {
           border: "none",
           color: "#55555F",
           cursor: "pointer",
-          fontSize: 16,
-          marginLeft: 8,
+          fontSize: 14,
+          marginLeft: 4,
           padding: 0,
         }}
       >
@@ -285,23 +283,22 @@ function DemoNav({ onOpenSettings }: { onOpenSettings: () => void }) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   const linkStyle = (key: string): React.CSSProperties => ({
-    padding: "8px 16px",
-    borderRadius: 8,
+    padding: "7px 14px",
+    borderRadius: 7,
     backgroundColor:
-      hovered === key ? "rgba(229, 57, 53, 0.1)" : "rgba(255, 255, 255, 0.04)",
-    border: `1px solid ${hovered === key ? "rgba(229, 57, 53, 0.2)" : "rgba(255, 255, 255, 0.06)"}`,
-    color: hovered === key ? "#E53935" : "#8E8E9A",
-    fontSize: 13,
+      hovered === key ? "rgba(255, 255, 255, 0.06)" : "rgba(255, 255, 255, 0.03)",
+    border: `1px solid ${hovered === key ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.04)"}`,
+    color: hovered === key ? "#F5F5F7" : "#6E6E7A",
+    fontSize: 12,
     fontWeight: 500,
     textDecoration: "none",
     cursor: "pointer",
-    transition: "all 0.15s ease",
-    fontFamily:
-      '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    transition: "all 0.12s ease",
+    fontFamily: FONT,
   });
 
   return (
-    <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+    <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
       <button
         style={linkStyle("settings")}
         onClick={onOpenSettings}
