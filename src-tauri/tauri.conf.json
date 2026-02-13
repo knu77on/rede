@@ -13,12 +13,14 @@
     "windows": [
       {
         "title": "REDE",
-        "width": 400,
-        "height": 600,
-        "resizable": false,
+        "width": 520,
+        "height": 740,
+        "minWidth": 440,
+        "minHeight": 560,
+        "resizable": true,
         "decorations": false,
         "transparent": true,
-        "alwaysOnTop": true,
+        "alwaysOnTop": false,
         "visible": false
       }
     ],

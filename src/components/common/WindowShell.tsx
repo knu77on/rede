@@ -1,6 +1,7 @@
 // ============================================================
 // REDE - macOS Window Shell
 // Shared chrome for all views: traffic lights, title bar, glass bg
+// Fully responsive — content scrolls if it exceeds the viewport
 // ============================================================
 
 import { type CSSProperties, useState, type ReactNode } from "react";
@@ -11,17 +12,11 @@ interface WindowShellProps {
   children: ReactNode;
   /** Optional title shown centered in title bar */
   title?: string;
-  /** If true, content area scrolls. Default true */
-  scrollable?: boolean;
   /** Extra content rendered in the title bar to the right of the title */
   toolbar?: ReactNode;
   /** Whether to show the glass bg or transparent (for HUD overlay) */
   transparent?: boolean;
 }
-
-// --- Constants ---
-
-const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 
 // --- Traffic Light Helpers ---
 
@@ -46,9 +41,6 @@ async function windowAction(action: "close" | "minimize" | "toggleMaximize") {
 
 // --- Traffic Light Component ---
 
-const LIGHT_SIZE = 12;
-const LIGHT_GAP = 8;
-
 const trafficLightColors = {
   close: { bg: "#FF5F57", hover: "#FF3B30" },
   minimize: { bg: "#FEBC2E", hover: "#FFB800" },
@@ -71,8 +63,8 @@ function TrafficLight({ type, onClick }: { type: "close" | "minimize" | "maximiz
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        width: LIGHT_SIZE,
-        height: LIGHT_SIZE,
+        width: 12,
+        height: 12,
         borderRadius: "50%",
         backgroundColor: hovered ? colors.hover : colors.bg,
         border: "none",
@@ -97,7 +89,7 @@ function TrafficLight({ type, onClick }: { type: "close" | "minimize" | "maximiz
 
 function TrafficLights() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: LIGHT_GAP, flexShrink: 0 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
       <TrafficLight type="close" onClick={() => windowAction("close")} />
       <TrafficLight type="minimize" onClick={() => windowAction("minimize")} />
       <TrafficLight type="maximize" onClick={() => windowAction("toggleMaximize")} />
@@ -107,6 +99,8 @@ function TrafficLights() {
 
 // --- Styles ---
 
+const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
 const shellStyle: CSSProperties = {
   display: "flex",
   flexDirection: "column",
@@ -115,7 +109,6 @@ const shellStyle: CSSProperties = {
   fontFamily: FONT,
   color: "#F5F5F7",
   overflow: "hidden",
-  // Subtle noise texture via radial gradient
   background: `
     radial-gradient(ellipse at 20% 0%, rgba(229, 57, 53, 0.03) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 100%, rgba(229, 57, 53, 0.02) 0%, transparent 50%),
@@ -133,11 +126,11 @@ const titleBarStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
   padding: "0 16px",
-  height: 48,
-  minHeight: 48,
+  height: 42,
+  minHeight: 42,
+  flexShrink: 0,
   userSelect: "none",
-  // Draggable region for Tauri
-  // @ts-expect-error Tauri specific CSS
+  // @ts-expect-error Tauri draggable region
   WebkitAppRegion: "drag",
   position: "relative",
   zIndex: 10,
@@ -147,9 +140,8 @@ const titleBarStyle: CSSProperties = {
   WebkitBackdropFilter: "blur(24px) saturate(1.3)",
 };
 
-const titleBarButtonsStyle: CSSProperties = {
-  // Buttons are not draggable
-  // @ts-expect-error Tauri specific CSS
+const noDragStyle: CSSProperties = {
+  // @ts-expect-error Tauri no-drag
   WebkitAppRegion: "no-drag",
 };
 
@@ -159,45 +151,41 @@ const titleTextStyle: CSSProperties = {
   transform: "translateX(-50%)",
   fontSize: 12,
   fontWeight: 600,
-  color: "#8E8E9A",
+  color: "#6E6E7A",
   letterSpacing: "-0.01em",
   pointerEvents: "none",
 };
 
 const toolbarAreaStyle: CSSProperties = {
+  ...noDragStyle,
   marginLeft: "auto",
-  // @ts-expect-error Tauri specific CSS
-  WebkitAppRegion: "no-drag",
 };
 
-const contentWrapperStyle: CSSProperties = {
+// Content always scrolls when it overflows — no content cutoff
+const contentStyle: CSSProperties = {
   flex: 1,
-  overflow: "hidden",
+  overflowY: "auto",
+  overflowX: "hidden",
   display: "flex",
   flexDirection: "column",
 };
 
-const contentScrollStyle: CSSProperties = {
-  flex: 1,
-  overflow: "auto",
-};
-
 // --- Component ---
 
-export function WindowShell({ children, title, scrollable = true, toolbar, transparent = false }: WindowShellProps) {
+export function WindowShell({ children, title, toolbar, transparent = false }: WindowShellProps) {
   return (
     <div style={transparent ? shellTransparentStyle : shellStyle}>
       {/* Title bar with traffic lights */}
       <div style={titleBarStyle}>
-        <div style={titleBarButtonsStyle}>
+        <div style={noDragStyle}>
           <TrafficLights />
         </div>
         {title && <span style={titleTextStyle}>{title}</span>}
         {toolbar && <div style={toolbarAreaStyle}>{toolbar}</div>}
       </div>
 
-      {/* Content area */}
-      <div style={scrollable ? contentScrollStyle : contentWrapperStyle}>
+      {/* Content — scrolls when needed, never clips */}
+      <div style={contentStyle}>
         {children}
       </div>
     </div>

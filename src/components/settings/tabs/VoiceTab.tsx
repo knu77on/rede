@@ -11,85 +11,88 @@ import type { ActivationMode, AudioDevice } from "../../../types/index";
 
 const styles: Record<string, CSSProperties> = {
   section: {
-    marginBottom: 32,
+    marginBottom: 28,
   },
   sectionTitle: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: 600,
-    color: "#A0A0B0",
+    color: "#8E8E9A",
     textTransform: "uppercase" as const,
-    letterSpacing: "0.05em",
-    marginBottom: 12,
+    letterSpacing: "0.06em",
+    marginBottom: 8,
+    paddingLeft: 2,
   },
-  sectionContent: {
-    backgroundColor: "rgba(28, 28, 35, 0.95)",
-    borderRadius: 12,
-    padding: "4px 16px",
+  card: {
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderRadius: 10,
+    padding: "2px 14px",
     border: "1px solid rgba(255, 255, 255, 0.06)",
   },
   divider: {
     height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     margin: 0,
   },
   row: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "14px 0",
+    padding: "12px 0",
     gap: 16,
   },
   rowLabel: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 500,
-    color: "#FFFFFF",
+    color: "#F5F5F7",
   },
   rowDescription: {
-    fontSize: 12,
-    color: "#A0A0B0",
+    fontSize: 11,
+    color: "#8E8E9A",
     marginTop: 2,
   },
   select: {
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    borderRadius: 8,
-    padding: "8px 12px",
-    color: "#FFFFFF",
-    fontSize: 13,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: 7,
+    padding: "7px 12px",
+    color: "#F5F5F7",
+    fontSize: 12,
+    fontWeight: 500,
     fontFamily: "inherit",
     cursor: "pointer",
-    minWidth: 180,
+    minWidth: 170,
     appearance: "none" as const,
     backgroundImage:
-      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A0A0B0' d='M3 5l3 3 3-3'/%3E%3C/svg%3E\")",
+      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%238E8E9A' d='M2.5 4l2.5 2.5L7.5 4'/%3E%3C/svg%3E\")",
     backgroundRepeat: "no-repeat",
     backgroundPosition: "right 10px center",
     paddingRight: 28,
     outline: "none",
+    transition: "all 0.12s ease",
   },
   segmentedControl: {
     display: "flex",
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
-    borderRadius: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 7,
     padding: 2,
-    gap: 2,
+    gap: 1,
   },
   segmentButton: {
-    padding: "6px 14px",
-    borderRadius: 6,
+    padding: "5px 12px",
+    borderRadius: 5,
     border: "none",
     backgroundColor: "transparent",
-    color: "#A0A0B0",
-    fontSize: 13,
+    color: "#8E8E9A",
+    fontSize: 12,
     fontWeight: 500,
     cursor: "pointer",
     transition: "all 0.15s ease",
     fontFamily: "inherit",
   },
   segmentButtonActive: {
-    backgroundColor: "#E53935",
-    color: "#FFFFFF",
-    boxShadow: "0 2px 8px rgba(229, 57, 53, 0.3)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    color: "#F5F5F7",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
   },
 };
 
@@ -111,7 +114,6 @@ export function VoiceTab() {
   useEffect(() => {
     async function loadDevices() {
       try {
-        // Request microphone permission to enumerate devices
         await navigator.mediaDevices.getUserMedia({ audio: true });
         const devices = await navigator.mediaDevices.enumerateDevices();
         const inputDevices: AudioDevice[] = devices
@@ -123,7 +125,6 @@ export function VoiceTab() {
           }));
         setAudioDevices(inputDevices);
       } catch {
-        // Fallback with system default
         setAudioDevices([
           { id: "default", name: "System Default", is_default: true },
         ]);
@@ -151,13 +152,12 @@ export function VoiceTab() {
       {/* Input */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>Input</div>
-        <div style={styles.sectionContent}>
-          {/* Input Device */}
+        <div style={styles.card}>
           <div style={styles.row}>
             <div>
               <div style={styles.rowLabel}>Input Device</div>
               <div style={styles.rowDescription}>
-                Select which microphone to use for dictation
+                Microphone used for dictation
               </div>
             </div>
             <select
@@ -175,7 +175,6 @@ export function VoiceTab() {
 
           <div style={styles.divider} />
 
-          {/* Activation Mode */}
           <div style={styles.row}>
             <div>
               <div style={styles.rowLabel}>Activation Mode</div>
@@ -206,33 +205,30 @@ export function VoiceTab() {
       {/* Audio Processing */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>Audio Processing</div>
-        <div style={styles.sectionContent}>
-          {/* Noise Suppression */}
+        <div style={styles.card}>
           <Toggle
             checked={settings.noise_suppression}
             onChange={(v) => updateSetting("noise_suppression", v)}
             label="Noise Suppression"
-            description="Filter out background noise for cleaner audio capture"
+            description="Filter out background noise for cleaner audio"
           />
 
           <div style={styles.divider} />
 
-          {/* Whisper Mode */}
           <Toggle
             checked={settings.whisper_mode}
             onChange={(v) => updateSetting("whisper_mode", v)}
             label="Whisper Mode"
-            description="Boost microphone gain for quiet speech environments"
+            description="Boost gain for quiet speech environments"
           />
 
           <div style={styles.divider} />
 
-          {/* Auto-Silence */}
           <Toggle
             checked={settings.auto_silence}
             onChange={(v) => updateSetting("auto_silence", v)}
             label="Auto-Silence Detection"
-            description="Automatically stop recording after a period of silence"
+            description="Stop recording after a period of silence"
           />
         </div>
       </div>

@@ -221,7 +221,7 @@ function DemoShell({ onOpenSettings }: { onOpenSettings: () => void }) {
   }
 
   return (
-    <WindowShell title="REDE" scrollable={false}>
+    <WindowShell title="REDE">
       <div
         style={{
           flex: 1,

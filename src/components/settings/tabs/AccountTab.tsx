@@ -9,42 +9,43 @@ import { useAuthStore } from "../../../stores/authStore";
 
 const styles: Record<string, CSSProperties> = {
   section: {
-    marginBottom: 32,
+    marginBottom: 28,
   },
   sectionTitle: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: 600,
-    color: "#A0A0B0",
+    color: "#8E8E9A",
     textTransform: "uppercase" as const,
-    letterSpacing: "0.05em",
-    marginBottom: 12,
+    letterSpacing: "0.06em",
+    marginBottom: 8,
+    paddingLeft: 2,
   },
-  sectionContent: {
-    backgroundColor: "rgba(28, 28, 35, 0.95)",
-    borderRadius: 12,
-    padding: "4px 16px",
+  card: {
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderRadius: 10,
+    padding: "2px 14px",
     border: "1px solid rgba(255, 255, 255, 0.06)",
   },
   divider: {
     height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     margin: 0,
   },
   profileCard: {
     display: "flex",
     alignItems: "center",
-    gap: 16,
-    padding: "16px 0",
+    gap: 14,
+    padding: "14px 0",
   },
   avatar: {
-    width: 56,
-    height: 56,
+    width: 48,
+    height: 48,
     borderRadius: "50%",
-    backgroundColor: "rgba(229, 57, 53, 0.15)",
+    backgroundColor: "rgba(229, 57, 53, 0.12)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 700,
     color: "#E53935",
     flexShrink: 0,
@@ -59,123 +60,124 @@ const styles: Record<string, CSSProperties> = {
   profileInfo: {
     display: "flex",
     flexDirection: "column" as const,
-    gap: 2,
+    gap: 1,
     flex: 1,
     minWidth: 0,
   },
   profileName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 600,
-    color: "#FFFFFF",
+    color: "#F5F5F7",
   },
   profileEmail: {
-    fontSize: 13,
-    color: "#A0A0B0",
+    fontSize: 12,
+    color: "#8E8E9A",
   },
   profileProvider: {
     fontSize: 11,
-    color: "#606070",
+    color: "#55555F",
     textTransform: "capitalize" as const,
   },
   row: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "14px 0",
+    padding: "12px 0",
     gap: 16,
   },
   rowLabel: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 500,
-    color: "#FFFFFF",
+    color: "#F5F5F7",
   },
   rowDescription: {
-    fontSize: 12,
-    color: "#A0A0B0",
+    fontSize: 11,
+    color: "#8E8E9A",
     marginTop: 2,
   },
   statusBadge: {
     display: "inline-flex",
     alignItems: "center",
-    gap: 6,
-    padding: "4px 10px",
-    borderRadius: 6,
-    fontSize: 12,
+    gap: 5,
+    padding: "3px 9px",
+    borderRadius: 5,
+    fontSize: 11,
     fontWeight: 600,
     textTransform: "capitalize" as const,
   },
   statusActive: {
-    backgroundColor: "rgba(52, 211, 153, 0.15)",
+    backgroundColor: "rgba(52, 211, 153, 0.1)",
     color: "#34D399",
   },
   statusTrialing: {
-    backgroundColor: "rgba(229, 57, 53, 0.12)",
+    backgroundColor: "rgba(229, 57, 53, 0.1)",
     color: "#E53935",
   },
   statusExpired: {
-    backgroundColor: "rgba(248, 113, 113, 0.15)",
+    backgroundColor: "rgba(248, 113, 113, 0.1)",
     color: "#F87171",
   },
   statusPastDue: {
-    backgroundColor: "rgba(251, 191, 36, 0.15)",
+    backgroundColor: "rgba(251, 191, 36, 0.1)",
     color: "#FBBF24",
   },
   valueText: {
-    fontSize: 14,
-    color: "#A0A0B0",
+    fontSize: 13,
+    color: "#8E8E9A",
     fontWeight: 500,
+  },
+  manageButton: {
+    padding: "6px 14px",
+    borderRadius: 7,
+    border: "1px solid rgba(229, 57, 53, 0.2)",
+    backgroundColor: "rgba(229, 57, 53, 0.06)",
+    color: "#E53935",
+    fontSize: 12,
+    fontWeight: 500,
+    cursor: "pointer",
+    transition: "all 0.12s ease",
+    fontFamily: "inherit",
+    whiteSpace: "nowrap" as const,
   },
   signOutButton: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    padding: "12px 16px",
+    padding: "10px 16px",
     borderRadius: 10,
-    border: "1px solid rgba(248, 113, 113, 0.25)",
-    backgroundColor: "rgba(248, 113, 113, 0.08)",
+    border: "1px solid rgba(248, 113, 113, 0.2)",
+    backgroundColor: "rgba(248, 113, 113, 0.06)",
     color: "#F87171",
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 600,
     cursor: "pointer",
-    transition: "all 0.15s ease",
+    transition: "all 0.12s ease",
     fontFamily: "inherit",
-  },
-  manageButton: {
-    padding: "8px 16px",
-    borderRadius: 8,
-    border: "1px solid rgba(229, 57, 53, 0.25)",
-    backgroundColor: "rgba(229, 57, 53, 0.08)",
-    color: "#E53935",
-    fontSize: 13,
-    fontWeight: 500,
-    cursor: "pointer",
-    transition: "all 0.15s ease",
-    fontFamily: "inherit",
-    whiteSpace: "nowrap" as const,
   },
   emptyState: {
     display: "flex",
     flexDirection: "column" as const,
     alignItems: "center",
     justifyContent: "center",
-    padding: "48px 24px",
+    padding: "40px 24px",
     textAlign: "center" as const,
   },
   emptyIcon: {
-    fontSize: 40,
-    marginBottom: 16,
-    opacity: 0.4,
+    fontSize: 32,
+    marginBottom: 12,
+    opacity: 0.3,
   },
   emptyTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 600,
-    color: "#FFFFFF",
-    marginBottom: 6,
+    color: "#F5F5F7",
+    marginBottom: 4,
   },
   emptyText: {
-    fontSize: 14,
-    color: "#A0A0B0",
+    fontSize: 12,
+    color: "#8E8E9A",
+    lineHeight: "17px",
   },
 };
 
@@ -190,9 +192,7 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-function getStatusStyle(
-  status: string,
-): CSSProperties {
+function getStatusStyle(status: string): CSSProperties {
   switch (status) {
     case "active":
       return styles.statusActive;
@@ -233,8 +233,7 @@ export function AccountTab() {
   }, [logout]);
 
   const handleManageSubscription = useCallback(() => {
-    // TODO: Open Stripe customer portal via Tauri shell
-    // await invoke("open_customer_portal");
+    // TODO: Open Stripe customer portal
   }, []);
 
   if (!isAuthenticated || !user) {
@@ -243,15 +242,12 @@ export function AccountTab() {
         <div style={styles.emptyIcon}>&#128100;</div>
         <div style={styles.emptyTitle}>Not signed in</div>
         <div style={styles.emptyText}>
-          Sign in to sync your settings, snippets, and dictionary across
-          devices.
+          Sign in to sync settings, snippets, and dictionary across devices.
         </div>
       </div>
     );
   }
 
-  // TODO: Fetch actual subscription from a subscription store
-  // For now, show a placeholder status
   const subscriptionStatus = "active";
   const subscriptionPlan: string = "monthly";
 
@@ -260,7 +256,7 @@ export function AccountTab() {
       {/* Profile */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>Profile</div>
-        <div style={styles.sectionContent}>
+        <div style={styles.card}>
           <div style={styles.profileCard}>
             <div style={styles.avatar}>
               {user.avatar_url ? (
@@ -287,8 +283,7 @@ export function AccountTab() {
       {/* Subscription */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>Subscription</div>
-        <div style={styles.sectionContent}>
-          {/* Status */}
+        <div style={styles.card}>
           <div style={styles.row}>
             <div>
               <div style={styles.rowLabel}>Status</div>
@@ -301,8 +296,8 @@ export function AccountTab() {
             >
               <span
                 style={{
-                  width: 6,
-                  height: 6,
+                  width: 5,
+                  height: 5,
                   borderRadius: "50%",
                   backgroundColor: "currentColor",
                 }}
@@ -313,7 +308,6 @@ export function AccountTab() {
 
           <div style={styles.divider} />
 
-          {/* Plan */}
           <div style={styles.row}>
             <div>
               <div style={styles.rowLabel}>Plan</div>
@@ -325,12 +319,11 @@ export function AccountTab() {
 
           <div style={styles.divider} />
 
-          {/* Manage */}
           <div style={styles.row}>
             <div>
               <div style={styles.rowLabel}>Manage Subscription</div>
               <div style={styles.rowDescription}>
-                Update payment method, change plan, or cancel
+                Update payment, change plan, or cancel
               </div>
             </div>
             <button

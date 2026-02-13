@@ -39,41 +39,42 @@ const TABS: TabDef[] = [
 const tabBarStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: 2,
+  gap: 1,
   backgroundColor: "rgba(255, 255, 255, 0.04)",
   borderRadius: 7,
   padding: 2,
 };
 
 const tabStyle: CSSProperties = {
-  padding: "5px 14px",
+  padding: "5px 12px",
   borderRadius: 5,
   border: "none",
   backgroundColor: "transparent",
-  color: "#8E8E9A",
-  fontSize: 12,
+  color: "#6E6E7A",
+  fontSize: 11,
   fontWeight: 500,
   cursor: "pointer",
   transition: "all 0.12s ease",
   fontFamily: "inherit",
   whiteSpace: "nowrap",
+  letterSpacing: "-0.01em",
 };
 
 const tabActiveStyle: CSSProperties = {
-  backgroundColor: "rgba(255, 255, 255, 0.07)",
+  backgroundColor: "rgba(255, 255, 255, 0.08)",
   color: "#F5F5F7",
-  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.15)",
+  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.2), 0 0.5px 0 rgba(255, 255, 255, 0.04) inset",
 };
 
 const tabHoverStyle: CSSProperties = {
-  color: "#CCCCD0",
+  color: "#8E8E9A",
 };
 
 const contentInnerStyle: CSSProperties = {
   width: "100%",
-  maxWidth: 560,
+  maxWidth: 540,
   margin: "0 auto",
-  padding: "28px 32px 48px",
+  padding: "24px 28px 48px",
 };
 
 // --- Component ---

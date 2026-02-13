@@ -10,61 +10,64 @@ import { Toggle } from "../../common/Toggle";
 
 const styles: Record<string, CSSProperties> = {
   section: {
-    marginBottom: 32,
+    marginBottom: 28,
   },
   sectionTitle: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: 600,
-    color: "#A0A0B0",
+    color: "#8E8E9A",
     textTransform: "uppercase" as const,
-    letterSpacing: "0.05em",
-    marginBottom: 12,
+    letterSpacing: "0.06em",
+    marginBottom: 8,
+    paddingLeft: 2,
   },
-  sectionContent: {
-    backgroundColor: "rgba(28, 28, 35, 0.95)",
-    borderRadius: 12,
-    padding: "4px 16px",
+  card: {
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderRadius: 10,
+    padding: "2px 14px",
     border: "1px solid rgba(255, 255, 255, 0.06)",
   },
   divider: {
     height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     margin: 0,
   },
   row: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "14px 0",
+    padding: "12px 0",
     gap: 16,
   },
   rowLabel: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 500,
-    color: "#FFFFFF",
+    color: "#F5F5F7",
   },
   rowDescription: {
-    fontSize: 12,
-    color: "#A0A0B0",
+    fontSize: 11,
+    color: "#8E8E9A",
     marginTop: 2,
   },
   select: {
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    borderRadius: 8,
-    padding: "8px 12px",
-    color: "#FFFFFF",
-    fontSize: 13,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: 7,
+    padding: "7px 12px",
+    color: "#F5F5F7",
+    fontSize: 12,
+    fontWeight: 500,
     fontFamily: "inherit",
     cursor: "pointer",
-    minWidth: 180,
+    minWidth: 170,
     appearance: "none" as const,
     backgroundImage:
-      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A0A0B0' d='M3 5l3 3 3-3'/%3E%3C/svg%3E\")",
+      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%238E8E9A' d='M2.5 4l2.5 2.5L7.5 4'/%3E%3C/svg%3E\")",
     backgroundRepeat: "no-repeat",
     backgroundPosition: "right 10px center",
     paddingRight: 28,
     outline: "none",
+    transition: "all 0.12s ease",
   },
 };
 
@@ -106,8 +109,7 @@ export function ProcessingTab() {
       {/* Text Correction */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>Text Correction</div>
-        <div style={styles.sectionContent}>
-          {/* Smart Correction */}
+        <div style={styles.card}>
           <Toggle
             checked={settings.smart_correction}
             onChange={(v) => updateSetting("smart_correction", v)}
@@ -117,12 +119,11 @@ export function ProcessingTab() {
 
           <div style={styles.divider} />
 
-          {/* Remove Fillers */}
           <Toggle
             checked={settings.remove_fillers}
             onChange={(v) => updateSetting("remove_fillers", v)}
             label="Remove Fillers"
-            description='Automatically remove "um", "uh", "like", and other filler words'
+            description='Remove "um", "uh", "like", and other filler words'
           />
         </div>
       </div>
@@ -130,18 +131,16 @@ export function ProcessingTab() {
       {/* Formatting */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>Formatting</div>
-        <div style={styles.sectionContent}>
-          {/* Auto-Punctuation */}
+        <div style={styles.card}>
           <Toggle
             checked={settings.auto_punctuation}
             onChange={(v) => updateSetting("auto_punctuation", v)}
             label="Auto-Punctuation"
-            description="Intelligently insert commas, periods, and other punctuation"
+            description="Insert commas, periods, and other punctuation"
           />
 
           <div style={styles.divider} />
 
-          {/* Auto-Capitalize */}
           <Toggle
             checked={settings.auto_capitalize}
             onChange={(v) => updateSetting("auto_capitalize", v)}
@@ -154,8 +153,7 @@ export function ProcessingTab() {
       {/* Language */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>Language</div>
-        <div style={styles.sectionContent}>
-          {/* Language Selector */}
+        <div style={styles.card}>
           <div style={styles.row}>
             <div>
               <div style={styles.rowLabel}>Language</div>
@@ -182,12 +180,11 @@ export function ProcessingTab() {
 
           <div style={styles.divider} />
 
-          {/* Auto-Detect Language */}
           <Toggle
             checked={settings.auto_detect_language}
             onChange={(v) => updateSetting("auto_detect_language", v)}
             label="Auto-Detect Language"
-            description="Automatically detect the spoken language instead of using a fixed selection"
+            description="Detect the spoken language automatically"
           />
         </div>
       </div>
