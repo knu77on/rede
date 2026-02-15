@@ -1,5 +1,6 @@
 // ============================================================
 // REDE - Processing Settings Tab
+// Compact — no scrolling, no redundant descriptions
 // ============================================================
 
 import { type CSSProperties, useCallback } from "react";
@@ -10,15 +11,15 @@ import { Toggle } from "../../common/Toggle";
 
 const styles: Record<string, CSSProperties> = {
   section: {
-    marginBottom: 28,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 11,
     fontWeight: 600,
-    color: "#8E8E9A",
+    color: "#6E6E7A",
     textTransform: "uppercase" as const,
     letterSpacing: "0.06em",
-    marginBottom: 8,
+    marginBottom: 6,
     paddingLeft: 2,
   },
   card: {
@@ -36,7 +37,7 @@ const styles: Record<string, CSSProperties> = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "12px 0",
+    padding: "8px 0",
     gap: 16,
   },
   rowLabel: {
@@ -44,28 +45,23 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 500,
     color: "#F5F5F7",
   },
-  rowDescription: {
-    fontSize: 11,
-    color: "#8E8E9A",
-    marginTop: 2,
-  },
   select: {
     backgroundColor: "rgba(255, 255, 255, 0.05)",
     border: "1px solid rgba(255, 255, 255, 0.08)",
-    borderRadius: 7,
-    padding: "7px 12px",
+    borderRadius: 6,
+    padding: "5px 10px",
     color: "#F5F5F7",
     fontSize: 12,
     fontWeight: 500,
     fontFamily: "inherit",
     cursor: "pointer",
-    minWidth: 170,
+    minWidth: 160,
     appearance: "none" as const,
     backgroundImage:
-      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%238E8E9A' d='M2.5 4l2.5 2.5L7.5 4'/%3E%3C/svg%3E\")",
+      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236E6E7A' d='M2.5 4l2.5 2.5L7.5 4'/%3E%3C/svg%3E\")",
     backgroundRepeat: "no-repeat",
-    backgroundPosition: "right 10px center",
-    paddingRight: 28,
+    backgroundPosition: "right 8px center",
+    paddingRight: 24,
     outline: "none",
     transition: "all 0.12s ease",
   },
@@ -98,33 +94,19 @@ export function ProcessingTab() {
   const updateSetting = useSettingsStore((s) => s.updateSetting);
 
   const handleLanguageChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      updateSetting("language", e.target.value);
-    },
+    (e: React.ChangeEvent<HTMLSelectElement>) => updateSetting("language", e.target.value),
     [updateSetting],
   );
 
   return (
     <div>
-      {/* Text Correction */}
+      {/* Correction */}
       <div style={styles.section}>
-        <div style={styles.sectionTitle}>Text Correction</div>
+        <div style={styles.sectionTitle}>Correction</div>
         <div style={styles.card}>
-          <Toggle
-            checked={settings.smart_correction}
-            onChange={(v) => updateSetting("smart_correction", v)}
-            label="Smart Correction"
-            description="AI-powered self-correction detection and cleanup"
-          />
-
+          <Toggle checked={settings.smart_correction} onChange={(v) => updateSetting("smart_correction", v)} label="Smart Correction" />
           <div style={styles.divider} />
-
-          <Toggle
-            checked={settings.remove_fillers}
-            onChange={(v) => updateSetting("remove_fillers", v)}
-            label="Remove Fillers"
-            description='Remove "um", "uh", "like", and other filler words'
-          />
+          <Toggle checked={settings.remove_fillers} onChange={(v) => updateSetting("remove_fillers", v)} label="Remove Fillers" />
         </div>
       </div>
 
@@ -132,60 +114,31 @@ export function ProcessingTab() {
       <div style={styles.section}>
         <div style={styles.sectionTitle}>Formatting</div>
         <div style={styles.card}>
-          <Toggle
-            checked={settings.auto_punctuation}
-            onChange={(v) => updateSetting("auto_punctuation", v)}
-            label="Auto-Punctuation"
-            description="Insert commas, periods, and other punctuation"
-          />
-
+          <Toggle checked={settings.auto_punctuation} onChange={(v) => updateSetting("auto_punctuation", v)} label="Auto-Punctuation" />
           <div style={styles.divider} />
-
-          <Toggle
-            checked={settings.auto_capitalize}
-            onChange={(v) => updateSetting("auto_capitalize", v)}
-            label="Auto-Capitalize"
-            description="Capitalize the first letter of each sentence"
-          />
+          <Toggle checked={settings.auto_capitalize} onChange={(v) => updateSetting("auto_capitalize", v)} label="Auto-Capitalize" />
         </div>
       </div>
 
       {/* Language */}
-      <div style={styles.section}>
+      <div style={{ ...styles.section, marginBottom: 0 }}>
         <div style={styles.sectionTitle}>Language</div>
         <div style={styles.card}>
           <div style={styles.row}>
-            <div>
-              <div style={styles.rowLabel}>Language</div>
-              <div style={styles.rowDescription}>
-                Primary language for speech recognition
-              </div>
-            </div>
+            <div style={styles.rowLabel}>Language</div>
             <select
-              style={{
-                ...styles.select,
-                ...(settings.auto_detect_language ? { opacity: 0.5 } : {}),
-              }}
+              style={{ ...styles.select, ...(settings.auto_detect_language ? { opacity: 0.5 } : {}) }}
               value={settings.language}
               onChange={handleLanguageChange}
               disabled={settings.auto_detect_language}
             >
               {LANGUAGES.map((lang) => (
-                <option key={lang.value} value={lang.value}>
-                  {lang.label}
-                </option>
+                <option key={lang.value} value={lang.value}>{lang.label}</option>
               ))}
             </select>
           </div>
-
           <div style={styles.divider} />
-
-          <Toggle
-            checked={settings.auto_detect_language}
-            onChange={(v) => updateSetting("auto_detect_language", v)}
-            label="Auto-Detect Language"
-            description="Detect the spoken language automatically"
-          />
+          <Toggle checked={settings.auto_detect_language} onChange={(v) => updateSetting("auto_detect_language", v)} label="Auto-Detect" />
         </div>
       </div>
     </div>

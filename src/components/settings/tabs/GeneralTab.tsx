@@ -1,5 +1,6 @@
 // ============================================================
 // REDE - General Settings Tab
+// Compact — everything fits in one viewport, no scrolling
 // ============================================================
 
 import { type CSSProperties, useCallback, useState } from "react";
@@ -13,15 +14,15 @@ const APP_VERSION = "1.0.0";
 
 const styles: Record<string, CSSProperties> = {
   section: {
-    marginBottom: 28,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 11,
     fontWeight: 600,
-    color: "#8E8E9A",
+    color: "#6E6E7A",
     textTransform: "uppercase" as const,
     letterSpacing: "0.06em",
-    marginBottom: 8,
+    marginBottom: 6,
     paddingLeft: 2,
   },
   card: {
@@ -39,7 +40,7 @@ const styles: Record<string, CSSProperties> = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "12px 0",
+    padding: "8px 0",
     gap: 16,
   },
   rowLabel: {
@@ -47,34 +48,29 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 500,
     color: "#F5F5F7",
   },
-  rowDescription: {
-    fontSize: 11,
-    color: "#8E8E9A",
-    marginTop: 2,
-  },
   segmentedControl: {
     display: "flex",
     backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 7,
+    borderRadius: 6,
     padding: 2,
     gap: 1,
   },
   segmentButton: {
-    padding: "5px 12px",
-    borderRadius: 5,
+    padding: "4px 11px",
+    borderRadius: 4,
     border: "none",
     backgroundColor: "transparent",
-    color: "#8E8E9A",
-    fontSize: 12,
+    color: "#6E6E7A",
+    fontSize: 11,
     fontWeight: 500,
     cursor: "pointer",
-    transition: "all 0.15s ease",
+    transition: "all 0.12s ease",
     fontFamily: "inherit",
   },
   segmentButtonActive: {
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     color: "#F5F5F7",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
+    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.2)",
   },
 };
 
@@ -123,18 +119,18 @@ function PositionGrid({
   const [hovered, setHovered] = useState<HudPosition | null>(null);
 
   const cellBase: CSSProperties = {
-    width: 28,
-    height: 28,
-    borderRadius: 5,
+    width: 22,
+    height: 22,
+    borderRadius: 4,
     border: "1px solid rgba(255, 255, 255, 0.06)",
     backgroundColor: "rgba(255, 255, 255, 0.03)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     cursor: "pointer",
-    fontSize: 11,
+    fontSize: 9,
     color: "#55555F",
-    transition: "all 0.12s ease",
+    transition: "all 0.1s ease",
     fontFamily: "inherit",
     padding: 0,
   };
@@ -150,12 +146,8 @@ function PositionGrid({
     color: "#8E8E9A",
   };
 
-  const emptyCell: CSSProperties = {
-    width: 28,
-    height: 28,
-  };
+  const emptyCell: CSSProperties = { width: 22, height: 22 };
 
-  // Build a 3x3 grid
   const grid: (typeof POSITION_GRID[0] | null)[][] = [
     [null, null, null],
     [null, null, null],
@@ -166,23 +158,17 @@ function PositionGrid({
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {grid.map((row, ri) => (
-        <div key={ri} style={{ display: "flex", gap: 3 }}>
+        <div key={ri} style={{ display: "flex", gap: 2 }}>
           {row.map((cell, ci) => {
-            if (!cell) {
-              return <div key={ci} style={emptyCell} />;
-            }
+            if (!cell) return <div key={ci} style={emptyCell} />;
             const isActive = value === cell.position;
             const isHov = hovered === cell.position && !isActive;
             return (
               <button
                 key={ci}
-                style={{
-                  ...cellBase,
-                  ...(isActive ? cellActive : {}),
-                  ...(isHov ? cellHover : {}),
-                }}
+                style={{ ...cellBase, ...(isActive ? cellActive : {}), ...(isHov ? cellHover : {}) }}
                 onClick={() => onChange(cell.position)}
                 onMouseEnter={() => setHovered(cell.position)}
                 onMouseLeave={() => setHovered(null)}
@@ -210,7 +196,6 @@ function UpdateButton() {
       const update = await check();
       setStatus(update ? "available" : "up-to-date");
     } catch {
-      // In browser/demo mode, just show up-to-date
       setStatus("up-to-date");
     }
   }, []);
@@ -223,20 +208,16 @@ function UpdateButton() {
     "Check for Updates";
 
   const buttonStyle: CSSProperties = {
-    padding: "6px 14px",
-    borderRadius: 7,
+    padding: "4px 11px",
+    borderRadius: 6,
     border: status === "available"
       ? "1px solid rgba(229, 57, 53, 0.3)"
-      : "1px solid rgba(255, 255, 255, 0.1)",
+      : "1px solid rgba(255, 255, 255, 0.08)",
     backgroundColor: status === "available"
       ? "rgba(229, 57, 53, 0.1)"
       : "rgba(255, 255, 255, 0.04)",
-    color: status === "available"
-      ? "#E53935"
-      : status === "up-to-date"
-      ? "#4CAF50"
-      : "#F5F5F7",
-    fontSize: 12,
+    color: status === "available" ? "#E53935" : status === "up-to-date" ? "#4CAF50" : "#8E8E9A",
+    fontSize: 11,
     fontWeight: 500,
     cursor: status === "checking" ? "default" : "pointer",
     transition: "all 0.12s ease",
@@ -259,23 +240,17 @@ export function GeneralTab() {
   const updateSetting = useSettingsStore((s) => s.updateSetting);
 
   const handleThemeChange = useCallback(
-    (theme: Theme) => {
-      updateSetting("theme", theme);
-    },
+    (theme: Theme) => updateSetting("theme", theme),
     [updateSetting],
   );
 
   const handleHudSizeChange = useCallback(
-    (size: HudSize) => {
-      updateSetting("hud_size", size);
-    },
+    (size: HudSize) => updateSetting("hud_size", size),
     [updateSetting],
   );
 
   const handleHudPositionChange = useCallback(
-    (position: HudPosition) => {
-      updateSetting("hud_position", position);
-    },
+    (position: HudPosition) => updateSetting("hud_position", position),
     [updateSetting],
   );
 
@@ -286,18 +261,14 @@ export function GeneralTab() {
         <div style={styles.sectionTitle}>Appearance</div>
         <div style={styles.card}>
           <div style={styles.row}>
-            <div>
-              <div style={styles.rowLabel}>Theme</div>
-            </div>
+            <div style={styles.rowLabel}>Theme</div>
             <div style={styles.segmentedControl}>
               {THEME_OPTIONS.map((option) => (
                 <button
                   key={option.value}
                   style={{
                     ...styles.segmentButton,
-                    ...(settings.theme === option.value
-                      ? styles.segmentButtonActive
-                      : {}),
+                    ...(settings.theme === option.value ? styles.segmentButtonActive : {}),
                   }}
                   onClick={() => handleThemeChange(option.value)}
                 >
@@ -314,21 +285,14 @@ export function GeneralTab() {
         <div style={styles.sectionTitle}>HUD</div>
         <div style={styles.card}>
           <div style={styles.row}>
-            <div>
-              <div style={styles.rowLabel}>Size</div>
-              <div style={styles.rowDescription}>
-                Overlay dimensions
-              </div>
-            </div>
+            <div style={styles.rowLabel}>Size</div>
             <div style={styles.segmentedControl}>
               {HUD_SIZE_OPTIONS.map((option) => (
                 <button
                   key={option.value}
                   style={{
                     ...styles.segmentButton,
-                    ...(settings.hud_size === option.value
-                      ? styles.segmentButtonActive
-                      : {}),
+                    ...(settings.hud_size === option.value ? styles.segmentButtonActive : {}),
                   }}
                   onClick={() => handleHudSizeChange(option.value)}
                 >
@@ -341,16 +305,8 @@ export function GeneralTab() {
           <div style={styles.divider} />
 
           <div style={styles.row}>
-            <div>
-              <div style={styles.rowLabel}>Position</div>
-              <div style={styles.rowDescription}>
-                Where the HUD appears
-              </div>
-            </div>
-            <PositionGrid
-              value={settings.hud_position}
-              onChange={handleHudPositionChange}
-            />
+            <div style={styles.rowLabel}>Position</div>
+            <PositionGrid value={settings.hud_position} onChange={handleHudPositionChange} />
           </div>
 
           <div style={styles.divider} />
@@ -358,8 +314,7 @@ export function GeneralTab() {
           <Toggle
             checked={settings.show_glow}
             onChange={(v) => updateSetting("show_glow", v)}
-            label="Glow Effect"
-            description="Animated glow while recording"
+            label="Recording Glow"
           />
         </div>
       </div>
@@ -372,37 +327,30 @@ export function GeneralTab() {
             checked={settings.launch_at_login}
             onChange={(v) => updateSetting("launch_at_login", v)}
             label="Launch at Login"
-            description="Start REDE when you log in"
           />
-
           <div style={styles.divider} />
-
           <Toggle
             checked={settings.show_stats}
             onChange={(v) => updateSetting("show_stats", v)}
             label="Show Stats"
-            description="Word count and duration after dictation"
           />
-
           <div style={styles.divider} />
-
           <Toggle
             checked={settings.play_sounds}
             onChange={(v) => updateSetting("play_sounds", v)}
-            label="Play Sounds"
-            description="Audio feedback for recording events"
+            label="Sound Effects"
           />
         </div>
       </div>
 
-      {/* About & Updates */}
-      <div style={styles.section}>
+      {/* About */}
+      <div style={{ ...styles.section, marginBottom: 0 }}>
         <div style={styles.sectionTitle}>About</div>
         <div style={styles.card}>
           <div style={styles.row}>
             <div>
               <div style={styles.rowLabel}>REDE</div>
-              <div style={styles.rowDescription}>
+              <div style={{ fontSize: 11, color: "#55555F", marginTop: 1 }}>
                 Version {APP_VERSION}
               </div>
             </div>

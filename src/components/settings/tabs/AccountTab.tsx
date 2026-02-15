@@ -1,5 +1,6 @@
 // ============================================================
 // REDE - Account Settings Tab
+// Compact — no scrolling
 // ============================================================
 
 import { type CSSProperties, useCallback } from "react";
@@ -9,15 +10,15 @@ import { useAuthStore } from "../../../stores/authStore";
 
 const styles: Record<string, CSSProperties> = {
   section: {
-    marginBottom: 28,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 11,
     fontWeight: 600,
-    color: "#8E8E9A",
+    color: "#6E6E7A",
     textTransform: "uppercase" as const,
     letterSpacing: "0.06em",
-    marginBottom: 8,
+    marginBottom: 6,
     paddingLeft: 2,
   },
   card: {
@@ -34,18 +35,18 @@ const styles: Record<string, CSSProperties> = {
   profileCard: {
     display: "flex",
     alignItems: "center",
-    gap: 14,
-    padding: "14px 0",
+    gap: 12,
+    padding: "10px 0",
   },
   avatar: {
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
     borderRadius: "50%",
     backgroundColor: "rgba(229, 57, 53, 0.12)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 700,
     color: "#E53935",
     flexShrink: 0,
@@ -60,29 +61,23 @@ const styles: Record<string, CSSProperties> = {
   profileInfo: {
     display: "flex",
     flexDirection: "column" as const,
-    gap: 1,
     flex: 1,
     minWidth: 0,
   },
   profileName: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 600,
     color: "#F5F5F7",
   },
   profileEmail: {
-    fontSize: 12,
-    color: "#8E8E9A",
-  },
-  profileProvider: {
     fontSize: 11,
-    color: "#55555F",
-    textTransform: "capitalize" as const,
+    color: "#6E6E7A",
   },
   row: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "12px 0",
+    padding: "8px 0",
     gap: 16,
   },
   rowLabel: {
@@ -90,17 +85,12 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 500,
     color: "#F5F5F7",
   },
-  rowDescription: {
-    fontSize: 11,
-    color: "#8E8E9A",
-    marginTop: 2,
-  },
   statusBadge: {
     display: "inline-flex",
     alignItems: "center",
-    gap: 5,
-    padding: "3px 9px",
-    borderRadius: 5,
+    gap: 4,
+    padding: "2px 8px",
+    borderRadius: 4,
     fontSize: 11,
     fontWeight: 600,
     textTransform: "capitalize" as const,
@@ -122,17 +112,17 @@ const styles: Record<string, CSSProperties> = {
     color: "#FBBF24",
   },
   valueText: {
-    fontSize: 13,
-    color: "#8E8E9A",
+    fontSize: 12,
+    color: "#6E6E7A",
     fontWeight: 500,
   },
   manageButton: {
-    padding: "6px 14px",
-    borderRadius: 7,
+    padding: "4px 11px",
+    borderRadius: 6,
     border: "1px solid rgba(229, 57, 53, 0.2)",
     backgroundColor: "rgba(229, 57, 53, 0.06)",
     color: "#E53935",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 500,
     cursor: "pointer",
     transition: "all 0.12s ease",
@@ -144,12 +134,12 @@ const styles: Record<string, CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    padding: "10px 16px",
-    borderRadius: 10,
-    border: "1px solid rgba(248, 113, 113, 0.2)",
-    backgroundColor: "rgba(248, 113, 113, 0.06)",
+    padding: "8px 16px",
+    borderRadius: 8,
+    border: "1px solid rgba(248, 113, 113, 0.15)",
+    backgroundColor: "rgba(248, 113, 113, 0.05)",
     color: "#F87171",
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
     transition: "all 0.12s ease",
@@ -160,61 +150,46 @@ const styles: Record<string, CSSProperties> = {
     flexDirection: "column" as const,
     alignItems: "center",
     justifyContent: "center",
-    padding: "40px 24px",
+    padding: "32px 24px",
     textAlign: "center" as const,
   },
   emptyIcon: {
-    fontSize: 32,
-    marginBottom: 12,
+    fontSize: 28,
+    marginBottom: 8,
     opacity: 0.3,
   },
   emptyTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 600,
     color: "#F5F5F7",
-    marginBottom: 4,
+    marginBottom: 3,
   },
   emptyText: {
-    fontSize: 12,
-    color: "#8E8E9A",
-    lineHeight: "17px",
+    fontSize: 11,
+    color: "#6E6E7A",
+    lineHeight: "15px",
   },
 };
 
 // --- Helpers ---
 
 function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((part) => part.charAt(0))
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  return name.split(" ").map((p) => p.charAt(0)).join("").toUpperCase().slice(0, 2);
 }
 
 function getStatusStyle(status: string): CSSProperties {
   switch (status) {
-    case "active":
-      return styles.statusActive;
-    case "trialing":
-      return styles.statusTrialing;
-    case "past_due":
-      return styles.statusPastDue;
+    case "active": return styles.statusActive;
+    case "trialing": return styles.statusTrialing;
+    case "past_due": return styles.statusPastDue;
     case "canceled":
-    case "expired":
-      return styles.statusExpired;
-    default:
-      return styles.statusActive;
+    case "expired": return styles.statusExpired;
+    default: return styles.statusActive;
   }
 }
 
 function formatStatusLabel(status: string): string {
-  switch (status) {
-    case "past_due":
-      return "Past Due";
-    default:
-      return status;
-  }
+  return status === "past_due" ? "Past Due" : status;
 }
 
 // --- Component ---
@@ -225,11 +200,7 @@ export function AccountTab() {
   const logout = useAuthStore((s) => s.logout);
 
   const handleSignOut = useCallback(async () => {
-    try {
-      await logout();
-    } catch {
-      // Error is handled by the store
-    }
+    try { await logout(); } catch { /* store */ }
   }, [logout]);
 
   const handleManageSubscription = useCallback(() => {
@@ -241,9 +212,7 @@ export function AccountTab() {
       <div style={styles.emptyState}>
         <div style={styles.emptyIcon}>&#128100;</div>
         <div style={styles.emptyTitle}>Not signed in</div>
-        <div style={styles.emptyText}>
-          Sign in to sync settings, snippets, and dictionary across devices.
-        </div>
+        <div style={styles.emptyText}>Sign in to sync across devices.</div>
       </div>
     );
   }
@@ -260,11 +229,7 @@ export function AccountTab() {
           <div style={styles.profileCard}>
             <div style={styles.avatar}>
               {user.avatar_url ? (
-                <img
-                  src={user.avatar_url}
-                  alt={user.name}
-                  style={styles.avatarImage}
-                />
+                <img src={user.avatar_url} alt={user.name} style={styles.avatarImage} />
               ) : (
                 getInitials(user.name)
               )}
@@ -272,9 +237,6 @@ export function AccountTab() {
             <div style={styles.profileInfo}>
               <span style={styles.profileName}>{user.name}</span>
               <span style={styles.profileEmail}>{user.email}</span>
-              <span style={styles.profileProvider}>
-                {user.auth_provider} account
-              </span>
             </div>
           </div>
         </div>
@@ -285,62 +247,28 @@ export function AccountTab() {
         <div style={styles.sectionTitle}>Subscription</div>
         <div style={styles.card}>
           <div style={styles.row}>
-            <div>
-              <div style={styles.rowLabel}>Status</div>
-            </div>
-            <span
-              style={{
-                ...styles.statusBadge,
-                ...getStatusStyle(subscriptionStatus),
-              }}
-            >
-              <span
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: "50%",
-                  backgroundColor: "currentColor",
-                }}
-              />
+            <div style={styles.rowLabel}>Status</div>
+            <span style={{ ...styles.statusBadge, ...getStatusStyle(subscriptionStatus) }}>
+              <span style={{ width: 4, height: 4, borderRadius: "50%", backgroundColor: "currentColor" }} />
               {formatStatusLabel(subscriptionStatus)}
             </span>
           </div>
-
           <div style={styles.divider} />
-
           <div style={styles.row}>
-            <div>
-              <div style={styles.rowLabel}>Plan</div>
-            </div>
-            <span style={styles.valueText}>
-              {subscriptionPlan === "annual" ? "Annual" : "Monthly"}
-            </span>
+            <div style={styles.rowLabel}>Plan</div>
+            <span style={styles.valueText}>{subscriptionPlan === "annual" ? "Annual" : "Monthly"}</span>
           </div>
-
           <div style={styles.divider} />
-
           <div style={styles.row}>
-            <div>
-              <div style={styles.rowLabel}>Manage Subscription</div>
-              <div style={styles.rowDescription}>
-                Update payment, change plan, or cancel
-              </div>
-            </div>
-            <button
-              style={styles.manageButton}
-              onClick={handleManageSubscription}
-            >
-              Manage
-            </button>
+            <div style={styles.rowLabel}>Manage</div>
+            <button style={styles.manageButton} onClick={handleManageSubscription}>Manage</button>
           </div>
         </div>
       </div>
 
       {/* Sign Out */}
-      <div style={styles.section}>
-        <button style={styles.signOutButton} onClick={handleSignOut}>
-          Sign Out
-        </button>
+      <div style={{ ...styles.section, marginBottom: 0 }}>
+        <button style={styles.signOutButton} onClick={handleSignOut}>Sign Out</button>
       </div>
     </div>
   );

@@ -74,7 +74,7 @@ const contentInnerStyle: CSSProperties = {
   width: "100%",
   maxWidth: 540,
   margin: "0 auto",
-  padding: "24px 28px 48px",
+  padding: "16px 28px 20px",
 };
 
 // --- Component ---
