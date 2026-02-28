@@ -22,17 +22,14 @@ function App() {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
-  // Start demo simulation loop
   useEffect(() => {
     if (!demo) return;
     const cleanup = startDemoLoop();
     return cleanup;
   }, [demo]);
 
-  // Feed completed dictations into history store
   useDictationHistory();
 
-  // In demo mode, skip auth gate
   if (!demo && !isAuthenticated) {
     return <AuthScreen />;
   }
@@ -45,9 +42,7 @@ function App() {
     return <AuthScreen />;
   }
 
-  return (
-    <DemoShell onOpenSettings={() => setView("settings")} />
-  );
+  return <DemoShell onOpenSettings={() => setView("settings")} />;
 }
 
 // --- Hook: Feed dictations into history ---
@@ -93,7 +88,6 @@ function useHudVisibility() {
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key !== "Control") return;
-
       if (activationMode === "push") {
         show();
       } else {
@@ -117,7 +111,6 @@ function useHudVisibility() {
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
@@ -129,9 +122,7 @@ function useHudVisibility() {
   const transcription = useRecordingStore((s) => s.transcription);
 
   useEffect(() => {
-    if (recordingState === "recording" || recordingState === "processing") {
-      show();
-    }
+    if (recordingState === "recording" || recordingState === "processing") show();
   }, [recordingState, show]);
 
   useEffect(() => {
@@ -144,9 +135,9 @@ function useHudVisibility() {
   return visible;
 }
 
-// --- HUD Wrapper with fade ---
+// --- HUD with fade ---
 
-const hudFadeKeyframes = `
+const hudFadeKf = `
 @keyframes rede-hud-fadein {
   from { opacity: 0; transform: scale(0.95) translateY(8px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
@@ -169,10 +160,7 @@ function HudWithVisibility({ alwaysVisible }: { alwaysVisible?: boolean }) {
       setAnimating("in");
     } else if (!shouldShow && mounted) {
       setAnimating("out");
-      const timer = setTimeout(() => {
-        setMounted(false);
-        setAnimating(null);
-      }, 250);
+      const timer = setTimeout(() => { setMounted(false); setAnimating(null); }, 250);
       return () => clearTimeout(timer);
     }
   }, [shouldShow, mounted]);
@@ -184,20 +172,18 @@ function HudWithVisibility({ alwaysVisible }: { alwaysVisible?: boolean }) {
     }
   }, [animating]);
 
-  if (!mounted) return <style>{hudFadeKeyframes}</style>;
+  if (!mounted) return <style>{hudFadeKf}</style>;
 
   return (
     <>
-      <style>{hudFadeKeyframes}</style>
-      <div
-        style={{
-          animation: animating === "in"
-            ? "rede-hud-fadein 250ms ease-out forwards"
-            : animating === "out"
-            ? "rede-hud-fadeout 250ms ease-out forwards"
-            : undefined,
-        }}
-      >
+      <style>{hudFadeKf}</style>
+      <div style={{
+        animation: animating === "in"
+          ? "rede-hud-fadein 250ms ease-out forwards"
+          : animating === "out"
+          ? "rede-hud-fadeout 250ms ease-out forwards"
+          : undefined,
+      }}>
         <FloatingHUD />
       </div>
     </>
@@ -206,7 +192,7 @@ function HudWithVisibility({ alwaysVisible }: { alwaysVisible?: boolean }) {
 
 // --- Demo Shell ---
 
-const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+const FONT = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
 
 function DemoShell({ onOpenSettings }: { onOpenSettings: () => void }) {
   const demo = isDemoMode();
@@ -222,17 +208,15 @@ function DemoShell({ onOpenSettings }: { onOpenSettings: () => void }) {
 
   return (
     <WindowShell title="REDE">
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 32,
-          fontFamily: FONT,
-        }}
-      >
+      <div style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 28,
+        fontFamily: FONT,
+      }}>
         {showNav && <DemoBanner onClose={() => setShowNav(false)} />}
         <HudWithVisibility alwaysVisible />
         {showNav && <DemoNav onOpenSettings={onOpenSettings} />}
@@ -243,34 +227,27 @@ function DemoShell({ onOpenSettings }: { onOpenSettings: () => void }) {
 
 function DemoBanner({ onClose }: { onClose: () => void }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        padding: "8px 16px",
-        borderRadius: 8,
-        backgroundColor: "rgba(229, 57, 53, 0.06)",
-        border: "1px solid rgba(229, 57, 53, 0.15)",
-        color: "#E53935",
-        fontSize: 12,
-        fontFamily: FONT,
-      }}
-    >
-      <span style={{ fontWeight: 600 }}>DEMO MODE</span>
-      <span style={{ color: "#6E6E7A" }}>
-        Simulated recording &mdash; no microphone or APIs needed
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      padding: "7px 14px",
+      borderRadius: 8,
+      backgroundColor: "rgba(239, 68, 68, 0.05)",
+      border: "1px solid rgba(239, 68, 68, 0.1)",
+      color: "#EF4444",
+      fontSize: 12,
+      fontFamily: FONT,
+    }}>
+      <span style={{ fontWeight: 700, fontSize: 10, letterSpacing: "0.04em" }}>DEMO</span>
+      <span style={{ color: "#5A5A66", fontWeight: 400 }}>
+        Simulated recording &mdash; no microphone needed
       </span>
       <button
         onClick={onClose}
         style={{
-          background: "none",
-          border: "none",
-          color: "#55555F",
-          cursor: "pointer",
-          fontSize: 14,
-          marginLeft: 4,
-          padding: 0,
+          background: "none", border: "none", color: "#4A4A56",
+          cursor: "pointer", fontSize: 14, marginLeft: 4, padding: 0,
         }}
       >
         &times;
@@ -285,20 +262,20 @@ function DemoNav({ onOpenSettings }: { onOpenSettings: () => void }) {
   const linkStyle = (key: string): React.CSSProperties => ({
     padding: "7px 14px",
     borderRadius: 7,
-    backgroundColor:
-      hovered === key ? "rgba(255, 255, 255, 0.06)" : "rgba(255, 255, 255, 0.03)",
-    border: `1px solid ${hovered === key ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.04)"}`,
-    color: hovered === key ? "#F5F5F7" : "#6E6E7A",
+    backgroundColor: hovered === key ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.02)",
+    border: `1px solid ${hovered === key ? "rgba(255, 255, 255, 0.07)" : "rgba(255, 255, 255, 0.035)"}`,
+    color: hovered === key ? "#EAEAEF" : "#5A5A66",
     fontSize: 12,
     fontWeight: 500,
     textDecoration: "none",
     cursor: "pointer",
     transition: "all 0.12s ease",
     fontFamily: FONT,
+    letterSpacing: "-0.01em",
   });
 
   return (
-    <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+    <div style={{ display: "flex", gap: 8 }}>
       <button
         style={linkStyle("settings")}
         onClick={onOpenSettings}
@@ -320,9 +297,8 @@ function DemoNav({ onOpenSettings }: { onOpenSettings: () => void }) {
 }
 
 function useAppView(): View {
-  const searchParams = new URLSearchParams(window.location.search);
-  const view = searchParams.get("view");
-
+  const params = new URLSearchParams(window.location.search);
+  const view = params.get("view");
   if (view === "settings") return "settings";
   if (view === "auth") return "auth";
   return "hud";

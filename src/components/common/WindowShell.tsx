@@ -1,7 +1,6 @@
 // ============================================================
-// REDE - macOS Window Shell
-// Shared chrome for all views: traffic lights, title bar, glass bg
-// Fully responsive — content scrolls if it exceeds the viewport
+// REDE - Window Shell
+// Refined macOS chrome with depth and ambient warmth
 // ============================================================
 
 import { type CSSProperties, useState, type ReactNode } from "react";
@@ -10,15 +9,12 @@ import { type CSSProperties, useState, type ReactNode } from "react";
 
 interface WindowShellProps {
   children: ReactNode;
-  /** Optional title shown centered in title bar */
   title?: string;
-  /** Extra content rendered in the title bar to the right of the title */
   toolbar?: ReactNode;
-  /** Whether to show the glass bg or transparent (for HUD overlay) */
   transparent?: boolean;
 }
 
-// --- Traffic Light Helpers ---
+// --- Traffic Lights ---
 
 async function windowAction(action: "close" | "minimize" | "toggleMaximize") {
   try {
@@ -39,9 +35,7 @@ async function windowAction(action: "close" | "minimize" | "toggleMaximize") {
   }
 }
 
-// --- Traffic Light Component ---
-
-const trafficLightColors = {
+const trafficColors = {
   close: { bg: "#FF5F57", hover: "#FF3B30" },
   minimize: { bg: "#FEBC2E", hover: "#FFB800" },
   maximize: { bg: "#28C840", hover: "#00D632" },
@@ -49,13 +43,8 @@ const trafficLightColors = {
 
 function TrafficLight({ type, onClick }: { type: "close" | "minimize" | "maximize"; onClick: () => void }) {
   const [hovered, setHovered] = useState(false);
-  const colors = trafficLightColors[type];
-
-  const icons: Record<string, string> = {
-    close: "\u2715",
-    minimize: "\u2013",
-    maximize: "\u2B1A",
-  };
+  const colors = trafficColors[type];
+  const icons: Record<string, string> = { close: "\u2715", minimize: "\u2013", maximize: "\u2B1A" };
 
   return (
     <button
@@ -99,20 +88,23 @@ function TrafficLights() {
 
 // --- Styles ---
 
-const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+const noDrag: CSSProperties = {
+  // @ts-expect-error Tauri no-drag
+  WebkitAppRegion: "no-drag",
+};
 
 const shellStyle: CSSProperties = {
   display: "flex",
   flexDirection: "column",
   width: "100%",
   height: "100vh",
-  fontFamily: FONT,
-  color: "#F5F5F7",
+  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+  color: "#EAEAEF",
   overflow: "hidden",
   background: `
-    radial-gradient(ellipse at 20% 0%, rgba(229, 57, 53, 0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 100%, rgba(229, 57, 53, 0.02) 0%, transparent 50%),
-    linear-gradient(180deg, #0E0E14 0%, #0A0A10 100%)
+    radial-gradient(ellipse at 30% -10%, rgba(229, 57, 53, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 110%, rgba(229, 57, 53, 0.025) 0%, transparent 60%),
+    linear-gradient(180deg, #0C0C14 0%, #09090F 100%)
   `,
 };
 
@@ -134,15 +126,10 @@ const titleBarStyle: CSSProperties = {
   WebkitAppRegion: "drag",
   position: "relative",
   zIndex: 10,
-  borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
-  backgroundColor: "rgba(14, 14, 20, 0.6)",
-  backdropFilter: "blur(24px) saturate(1.3)",
-  WebkitBackdropFilter: "blur(24px) saturate(1.3)",
-};
-
-const noDragStyle: CSSProperties = {
-  // @ts-expect-error Tauri no-drag
-  WebkitAppRegion: "no-drag",
+  borderBottom: "1px solid rgba(255, 255, 255, 0.035)",
+  backgroundColor: "rgba(12, 12, 18, 0.7)",
+  backdropFilter: "blur(20px) saturate(1.4)",
+  WebkitBackdropFilter: "blur(20px) saturate(1.4)",
 };
 
 const titleTextStyle: CSSProperties = {
@@ -151,17 +138,16 @@ const titleTextStyle: CSSProperties = {
   transform: "translateX(-50%)",
   fontSize: 12,
   fontWeight: 600,
-  color: "#6E6E7A",
+  color: "#5A5A66",
   letterSpacing: "-0.01em",
   pointerEvents: "none",
 };
 
-const toolbarAreaStyle: CSSProperties = {
-  ...noDragStyle,
+const toolbarStyle: CSSProperties = {
+  ...noDrag,
   marginLeft: "auto",
 };
 
-// Content always scrolls when it overflows — no content cutoff
 const contentStyle: CSSProperties = {
   flex: 1,
   overflowY: "auto",
@@ -175,16 +161,13 @@ const contentStyle: CSSProperties = {
 export function WindowShell({ children, title, toolbar, transparent = false }: WindowShellProps) {
   return (
     <div style={transparent ? shellTransparentStyle : shellStyle}>
-      {/* Title bar with traffic lights */}
       <div style={titleBarStyle}>
-        <div style={noDragStyle}>
+        <div style={noDrag}>
           <TrafficLights />
         </div>
         {title && <span style={titleTextStyle}>{title}</span>}
-        {toolbar && <div style={toolbarAreaStyle}>{toolbar}</div>}
+        {toolbar && <div style={toolbarStyle}>{toolbar}</div>}
       </div>
-
-      {/* Content — scrolls when needed, never clips */}
       <div style={contentStyle}>
         {children}
       </div>

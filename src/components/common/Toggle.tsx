@@ -1,10 +1,9 @@
 // ============================================================
-// REDE - Reusable Toggle Switch Component
+// REDE - Toggle Switch Component
+// Smooth, tactile toggle with subtle glow on activation
 // ============================================================
 
 import { type CSSProperties, useCallback } from "react";
-
-// --- Types ---
 
 interface ToggleProps {
   checked: boolean;
@@ -14,73 +13,6 @@ interface ToggleProps {
   disabled?: boolean;
 }
 
-// --- Styles ---
-
-const styles: Record<string, CSSProperties> = {
-  container: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "8px 0",
-    gap: 16,
-    cursor: "pointer",
-    userSelect: "none",
-  },
-  containerDisabled: {
-    opacity: 0.5,
-    pointerEvents: "none",
-  },
-  textBlock: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 1,
-    flex: 1,
-    minWidth: 0,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: 500,
-    color: "#F5F5F7",
-    lineHeight: "18px",
-  },
-  description: {
-    fontSize: 11,
-    fontWeight: 400,
-    color: "#6E6E7A",
-    lineHeight: "14px",
-  },
-  track: {
-    position: "relative",
-    width: 36,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.12)",
-    transition: "background-color 0.2s ease",
-    flexShrink: 0,
-    cursor: "pointer",
-  },
-  trackChecked: {
-    backgroundColor: "#E53935",
-  },
-  thumb: {
-    position: "absolute",
-    top: 2,
-    left: 2,
-    width: 16,
-    height: 16,
-    borderRadius: "50%",
-    backgroundColor: "#FFFFFF",
-    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.3)",
-  },
-  thumbChecked: {
-    transform: "translateX(16px)",
-    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.3), 0 0 6px rgba(229, 57, 53, 0.3)",
-  },
-};
-
-// --- Component ---
-
 export function Toggle({
   checked,
   onChange,
@@ -89,29 +21,60 @@ export function Toggle({
   disabled = false,
 }: ToggleProps) {
   const handleClick = useCallback(() => {
-    if (!disabled) {
-      onChange(!checked);
-    }
+    if (!disabled) onChange(!checked);
   }, [checked, onChange, disabled]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
+      if ((e.key === "Enter" || e.key === " ") && !disabled) {
         e.preventDefault();
-        if (!disabled) {
-          onChange(!checked);
-        }
+        onChange(!checked);
       }
     },
     [checked, onChange, disabled],
   );
 
+  const containerStyle: CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "9px 0",
+    gap: 14,
+    cursor: disabled ? "default" : "pointer",
+    userSelect: "none",
+    opacity: disabled ? 0.4 : 1,
+  };
+
+  const trackStyle: CSSProperties = {
+    position: "relative",
+    width: 38,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: checked ? "#E53935" : "rgba(255, 255, 255, 0.1)",
+    transition: "background-color 0.2s ease, box-shadow 0.2s ease",
+    flexShrink: 0,
+    cursor: disabled ? "default" : "pointer",
+    boxShadow: checked
+      ? "0 0 10px rgba(229, 57, 53, 0.2), inset 0 1px 1px rgba(0,0,0,0.1)"
+      : "inset 0 1px 2px rgba(0,0,0,0.15)",
+  };
+
+  const thumbStyle: CSSProperties = {
+    position: "absolute",
+    top: 2,
+    left: 2,
+    width: 18,
+    height: 18,
+    borderRadius: "50%",
+    backgroundColor: "#FFFFFF",
+    transition: "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.25)",
+    transform: checked ? "translateX(16px)" : "translateX(0)",
+  };
+
   return (
     <div
-      style={{
-        ...styles.container,
-        ...(disabled ? styles.containerDisabled : {}),
-      }}
+      style={containerStyle}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       role="switch"
@@ -119,22 +82,18 @@ export function Toggle({
       aria-label={label}
       tabIndex={disabled ? -1 : 0}
     >
-      <div style={styles.textBlock}>
-        <span style={styles.label}>{label}</span>
-        {description && <span style={styles.description}>{description}</span>}
+      <div style={{ display: "flex", flexDirection: "column", gap: 1, flex: 1, minWidth: 0 }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#EAEAEF", lineHeight: "18px" }}>
+          {label}
+        </span>
+        {description && (
+          <span style={{ fontSize: 11, color: "#5A5A66", lineHeight: "14px" }}>
+            {description}
+          </span>
+        )}
       </div>
-      <div
-        style={{
-          ...styles.track,
-          ...(checked ? styles.trackChecked : {}),
-        }}
-      >
-        <div
-          style={{
-            ...styles.thumb,
-            ...(checked ? styles.thumbChecked : {}),
-          }}
-        />
+      <div style={trackStyle}>
+        <div style={thumbStyle} />
       </div>
     </div>
   );

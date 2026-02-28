@@ -1,11 +1,9 @@
 // ============================================================
-// REDE - Reusable Button Component
-// macOS dark glass aesthetic
+// REDE - Button Component
+// Clean, confident buttons with depth and polish
 // ============================================================
 
 import React from "react";
-
-// --- Types ---
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
@@ -19,125 +17,92 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
-// --- Constants ---
-
-const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 const ACCENT = "#E53935";
-const ACCENT_HOVER = "#EF5350";
-const ACCENT_ACTIVE = "#C62828";
 
-// --- Styles ---
-
-const baseStyle: React.CSSProperties = {
+const base: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
   gap: 8,
   border: "none",
-  borderRadius: 8,
-  fontFamily: FONT,
-  fontWeight: 500,
+  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+  fontWeight: 600,
   cursor: "pointer",
-  transition: "all 120ms ease",
+  transition: "all 140ms ease",
   outline: "none",
   position: "relative",
   whiteSpace: "nowrap",
   userSelect: "none",
+  letterSpacing: "-0.01em",
 };
 
-const variantStyles: Record<ButtonVariant, React.CSSProperties> = {
+const variants: Record<ButtonVariant, { normal: React.CSSProperties; hover: React.CSSProperties; active: React.CSSProperties }> = {
   primary: {
-    backgroundColor: ACCENT,
-    color: "#FFFFFF",
-    boxShadow: "0 2px 8px rgba(229, 57, 53, 0.25)",
+    normal: {
+      background: `linear-gradient(180deg, #EF4444 0%, ${ACCENT} 100%)`,
+      color: "#FFFFFF",
+      boxShadow: "0 1px 2px rgba(0,0,0,0.3), 0 4px 12px rgba(229,57,53,0.2), inset 0 1px 0 rgba(255,255,255,0.12)",
+    },
+    hover: {
+      boxShadow: "0 2px 4px rgba(0,0,0,0.3), 0 6px 20px rgba(229,57,53,0.3), inset 0 1px 0 rgba(255,255,255,0.15)",
+      transform: "translateY(-0.5px)",
+    },
+    active: {
+      background: `linear-gradient(180deg, ${ACCENT} 0%, #C62828 100%)`,
+      boxShadow: "0 1px 2px rgba(0,0,0,0.4), inset 0 1px 2px rgba(0,0,0,0.1)",
+      transform: "translateY(0.5px)",
+    },
   },
   secondary: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    color: "#F5F5F7",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
+    normal: {
+      backgroundColor: "rgba(255, 255, 255, 0.04)",
+      color: "#CCCCD4",
+      border: "1px solid rgba(255, 255, 255, 0.07)",
+    },
+    hover: {
+      backgroundColor: "rgba(255, 255, 255, 0.07)",
+      color: "#EAEAEF",
+      borderColor: "rgba(255, 255, 255, 0.1)",
+    },
+    active: {
+      backgroundColor: "rgba(255, 255, 255, 0.03)",
+      color: "#CCCCD4",
+    },
   },
   ghost: {
-    backgroundColor: "transparent",
-    color: "#8E8E9A",
+    normal: {
+      backgroundColor: "transparent",
+      color: "#7A7A88",
+    },
+    hover: {
+      backgroundColor: "rgba(255, 255, 255, 0.04)",
+      color: "#EAEAEF",
+    },
+    active: {
+      backgroundColor: "rgba(255, 255, 255, 0.02)",
+    },
   },
   danger: {
-    backgroundColor: "rgba(248, 113, 113, 0.1)",
-    color: "#F87171",
-    border: "1px solid rgba(248, 113, 113, 0.15)",
+    normal: {
+      backgroundColor: "rgba(239, 68, 68, 0.08)",
+      color: "#EF4444",
+      border: "1px solid rgba(239, 68, 68, 0.12)",
+    },
+    hover: {
+      backgroundColor: "rgba(239, 68, 68, 0.14)",
+      borderColor: "rgba(239, 68, 68, 0.2)",
+    },
+    active: {
+      backgroundColor: "rgba(239, 68, 68, 0.1)",
+    },
   },
 };
 
-const variantHoverStyles: Record<ButtonVariant, React.CSSProperties> = {
-  primary: {
-    backgroundColor: ACCENT_HOVER,
-    boxShadow: "0 4px 12px rgba(229, 57, 53, 0.3)",
-  },
-  secondary: {
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-    borderColor: "rgba(255, 255, 255, 0.12)",
-  },
-  ghost: {
-    backgroundColor: "rgba(255, 255, 255, 0.04)",
-    color: "#F5F5F7",
-  },
-  danger: {
-    backgroundColor: "rgba(248, 113, 113, 0.18)",
-  },
+const sizes: Record<ButtonSize, React.CSSProperties> = {
+  sm: { padding: "6px 12px", fontSize: 12, borderRadius: 7 },
+  md: { padding: "9px 16px", fontSize: 13, borderRadius: 8 },
+  lg: { padding: "11px 22px", fontSize: 14, borderRadius: 10 },
 };
-
-const variantActiveStyles: Record<ButtonVariant, React.CSSProperties> = {
-  primary: {
-    backgroundColor: ACCENT_ACTIVE,
-    boxShadow: "0 1px 4px rgba(229, 57, 53, 0.2)",
-  },
-  secondary: {
-    backgroundColor: "rgba(255, 255, 255, 0.04)",
-  },
-  ghost: {
-    backgroundColor: "rgba(255, 255, 255, 0.03)",
-  },
-  danger: {
-    backgroundColor: "rgba(248, 113, 113, 0.24)",
-  },
-};
-
-const sizeStyles: Record<ButtonSize, React.CSSProperties> = {
-  sm: {
-    padding: "6px 12px",
-    fontSize: 12,
-    lineHeight: "16px",
-    borderRadius: 6,
-  },
-  md: {
-    padding: "10px 18px",
-    fontSize: 13,
-    lineHeight: "18px",
-    borderRadius: 8,
-  },
-  lg: {
-    padding: "12px 24px",
-    fontSize: 14,
-    lineHeight: "20px",
-    borderRadius: 10,
-  },
-};
-
-const disabledStyle: React.CSSProperties = {
-  opacity: 0.4,
-  cursor: "not-allowed",
-  pointerEvents: "none",
-};
-
-const spinnerStyle: React.CSSProperties = {
-  width: 16,
-  height: 16,
-  border: "2px solid rgba(255, 255, 255, 0.3)",
-  borderTopColor: "#FFFFFF",
-  borderRadius: "50%",
-  animation: "rede-spin 600ms linear infinite",
-};
-
-// --- Component ---
 
 export const Button: React.FC<ButtonProps> = ({
   variant = "primary",
@@ -156,17 +121,17 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   const [hovered, setHovered] = React.useState(false);
   const [pressed, setPressed] = React.useState(false);
-
   const isDisabled = disabled || loading;
+  const v = variants[variant];
 
-  const computedStyle: React.CSSProperties = {
-    ...baseStyle,
-    ...variantStyles[variant],
-    ...sizeStyles[size],
-    ...(hovered && !isDisabled ? variantHoverStyles[variant] : {}),
-    ...(pressed && !isDisabled ? variantActiveStyles[variant] : {}),
+  const computed: React.CSSProperties = {
+    ...base,
+    ...v.normal,
+    ...sizes[size],
+    ...(hovered && !isDisabled ? v.hover : {}),
+    ...(pressed && !isDisabled ? v.active : {}),
     ...(fullWidth ? { width: "100%" } : {}),
-    ...(isDisabled ? disabledStyle : {}),
+    ...(isDisabled ? { opacity: 0.35, cursor: "not-allowed", pointerEvents: "none" as const } : {}),
     ...style,
   };
 
@@ -174,28 +139,24 @@ export const Button: React.FC<ButtonProps> = ({
     <>
       <style>{`@keyframes rede-spin { to { transform: rotate(360deg); } }`}</style>
       <button
-        style={computedStyle}
+        style={computed}
         disabled={isDisabled}
-        onMouseEnter={(e) => {
-          setHovered(true);
-          onMouseEnter?.(e);
-        }}
-        onMouseLeave={(e) => {
-          setHovered(false);
-          setPressed(false);
-          onMouseLeave?.(e);
-        }}
-        onMouseDown={(e) => {
-          setPressed(true);
-          onMouseDown?.(e);
-        }}
-        onMouseUp={(e) => {
-          setPressed(false);
-          onMouseUp?.(e);
-        }}
+        onMouseEnter={(e) => { setHovered(true); onMouseEnter?.(e); }}
+        onMouseLeave={(e) => { setHovered(false); setPressed(false); onMouseLeave?.(e); }}
+        onMouseDown={(e) => { setPressed(true); onMouseDown?.(e); }}
+        onMouseUp={(e) => { setPressed(false); onMouseUp?.(e); }}
         {...rest}
       >
-        {loading ? <span style={spinnerStyle} /> : icon}
+        {loading ? (
+          <span style={{
+            width: 14,
+            height: 14,
+            border: "2px solid rgba(255, 255, 255, 0.25)",
+            borderTopColor: "#FFFFFF",
+            borderRadius: "50%",
+            animation: "rede-spin 600ms linear infinite",
+          }} />
+        ) : icon}
         {children}
       </button>
     </>

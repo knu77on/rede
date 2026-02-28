@@ -1,13 +1,11 @@
 // ============================================================
-// REDE - Registration Form Component
-// macOS dark glass aesthetic
+// REDE - Registration Form
+// Streamlined sign-up with password strength feedback
 // ============================================================
 
 import React from "react";
 import { Button } from "../common/Button";
 import { Input } from "../common/Input";
-
-// --- Types ---
 
 interface RegisterFormProps {
   onSubmit: (name: string, email: string, password: string) => void;
@@ -15,128 +13,43 @@ interface RegisterFormProps {
   error?: string | null;
 }
 
-// --- Constants ---
+interface StrengthResult { score: number; label: string; color: string; }
 
-const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-
-// --- Styles ---
-
-const formStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 16,
-  width: "100%",
-};
-
-const errorBannerStyle: React.CSSProperties = {
-  padding: "10px 14px",
-  backgroundColor: "rgba(248, 113, 113, 0.08)",
-  border: "1px solid rgba(248, 113, 113, 0.15)",
-  borderRadius: 8,
-  fontSize: 12,
-  color: "#F87171",
-  fontFamily: FONT,
-  lineHeight: "17px",
-};
-
-const strengthContainerStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 6,
-};
-
-const strengthBarTrackStyle: React.CSSProperties = {
-  display: "flex",
-  gap: 4,
-  height: 3,
-};
-
-const strengthSegmentBaseStyle: React.CSSProperties = {
-  flex: 1,
-  height: "100%",
-  borderRadius: 2,
-  backgroundColor: "rgba(255, 255, 255, 0.06)",
-  transition: "background-color 200ms ease",
-};
-
-const strengthLabelStyle: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 500,
-  fontFamily: FONT,
-  lineHeight: "14px",
-  transition: "color 200ms ease",
-};
-
-const termsTextStyle: React.CSSProperties = {
-  fontSize: 11,
-  color: "#55555F",
-  fontFamily: FONT,
-  textAlign: "center",
-  lineHeight: "16px",
-};
-
-const termsLinkStyle: React.CSSProperties = {
-  color: "#E53935",
-  textDecoration: "none",
-  cursor: "pointer",
-};
-
-// --- Password Strength ---
-
-interface StrengthResult {
-  score: number;
-  label: string;
-  color: string;
-}
-
-function computePasswordStrength(password: string): StrengthResult {
-  if (!password) return { score: 0, label: "", color: "#55555F" };
-
-  let score = 0;
-  if (password.length >= 8) score++;
-  if (password.length >= 12) score++;
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
-  if (/\d/.test(password)) score++;
-  if (/[^a-zA-Z0-9]/.test(password)) score++;
-  score = Math.min(4, score);
-
-  const levels: Record<number, { label: string; color: string }> = {
-    0: { label: "Very weak", color: "#F87171" },
-    1: { label: "Weak", color: "#F87171" },
-    2: { label: "Fair", color: "#FBBF24" },
-    3: { label: "Strong", color: "#34D399" },
-    4: { label: "Very strong", color: "#34D399" },
+function computeStrength(pw: string): StrengthResult {
+  if (!pw) return { score: 0, label: "", color: "#4A4A56" };
+  let s = 0;
+  if (pw.length >= 8) s++;
+  if (pw.length >= 12) s++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) s++;
+  if (/\d/.test(pw)) s++;
+  if (/[^a-zA-Z0-9]/.test(pw)) s++;
+  s = Math.min(4, s);
+  const map: Record<number, { label: string; color: string }> = {
+    0: { label: "Very weak", color: "#EF4444" },
+    1: { label: "Weak", color: "#EF4444" },
+    2: { label: "Fair", color: "#F59E0B" },
+    3: { label: "Strong", color: "#22C55E" },
+    4: { label: "Very strong", color: "#22C55E" },
   };
-
-  return { score, ...levels[score] };
+  return { score: s, ...map[s] };
 }
 
-// --- Validation ---
-
-function validateName(name: string): string | undefined {
-  if (!name.trim()) return "Name is required";
+function validateName(n: string) { return !n.trim() ? "Name is required" : undefined; }
+function validateEmail(e: string) {
+  if (!e.trim()) return "Email is required";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return "Enter a valid email";
   return undefined;
 }
-
-function validateEmail(email: string): string | undefined {
-  if (!email.trim()) return "Email is required";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Enter a valid email address";
+function validatePassword(p: string) {
+  if (!p) return "Password is required";
+  if (p.length < 8) return "At least 8 characters";
   return undefined;
 }
-
-function validatePassword(password: string): string | undefined {
-  if (!password) return "Password is required";
-  if (password.length < 8) return "Password must be at least 8 characters";
+function validateConfirm(pw: string, c: string) {
+  if (!c) return "Please confirm your password";
+  if (pw !== c) return "Passwords do not match";
   return undefined;
 }
-
-function validateConfirmPassword(password: string, confirm: string): string | undefined {
-  if (!confirm) return "Please confirm your password";
-  if (password !== confirm) return "Passwords do not match";
-  return undefined;
-}
-
-// --- Component ---
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({
   onSubmit,
@@ -146,62 +59,58 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [confirm, setConfirm] = React.useState("");
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [submitted, setSubmitted] = React.useState(false);
 
-  const strength = computePasswordStrength(password);
+  const strength = computeStrength(password);
 
-  const clearFieldError = (field: string) => {
-    if (fieldErrors[field]) {
-      setFieldErrors((prev) => {
-        const next = { ...prev };
-        delete next[field];
-        return next;
-      });
-    }
+  const clearErr = (f: string) => {
+    if (fieldErrors[f]) setFieldErrors((p) => { const n = { ...p }; delete n[f]; return n; });
   };
 
   const validate = (): boolean => {
-    const errors: Record<string, string> = {};
-
-    const nameError = validateName(name);
-    if (nameError) errors.name = nameError;
-
-    const emailError = validateEmail(email);
-    if (emailError) errors.email = emailError;
-
-    const passwordError = validatePassword(password);
-    if (passwordError) errors.password = passwordError;
-
-    const confirmError = validateConfirmPassword(password, confirmPassword);
-    if (confirmError) errors.confirmPassword = confirmError;
-
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
+    const e: Record<string, string> = {};
+    const ne = validateName(name); if (ne) e.name = ne;
+    const ee = validateEmail(email); if (ee) e.email = ee;
+    const pe = validatePassword(password); if (pe) e.password = pe;
+    const ce = validateConfirm(password, confirm); if (ce) e.confirm = ce;
+    setFieldErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (ev: React.FormEvent) => {
+    ev.preventDefault();
     setSubmitted(true);
-
     if (!validate()) return;
-
     onSubmit(name, email, password);
   };
 
   return (
-    <form style={formStyle} onSubmit={handleSubmit} noValidate>
-      {error && <div style={errorBannerStyle}>{error}</div>}
+    <form
+      style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%" }}
+      onSubmit={handleSubmit}
+      noValidate
+    >
+      {error && (
+        <div style={{
+          padding: "9px 14px",
+          backgroundColor: "rgba(239, 68, 68, 0.06)",
+          border: "1px solid rgba(239, 68, 68, 0.12)",
+          borderRadius: 8,
+          fontSize: 12,
+          color: "#EF4444",
+          lineHeight: "17px",
+        }}>
+          {error}
+        </div>
+      )}
 
       <Input
         label="Name"
         type="text"
         value={name}
-        onChange={(val) => {
-          setName(val);
-          if (submitted) clearFieldError("name");
-        }}
+        onChange={(v) => { setName(v); if (submitted) clearErr("name"); }}
         placeholder="Your name"
         error={fieldErrors.name}
         autoComplete="name"
@@ -212,46 +121,39 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         label="Email"
         type="email"
         value={email}
-        onChange={(val) => {
-          setEmail(val);
-          if (submitted) clearFieldError("email");
-        }}
+        onChange={(v) => { setEmail(v); if (submitted) clearErr("email"); }}
         placeholder="you@example.com"
         error={fieldErrors.email}
         autoComplete="email"
       />
 
-      <div style={strengthContainerStyle}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
         <Input
           label="Password"
           type="password"
           value={password}
-          onChange={(val) => {
-            setPassword(val);
-            if (submitted) clearFieldError("password");
-          }}
+          onChange={(v) => { setPassword(v); if (submitted) clearErr("password"); }}
           placeholder="At least 8 characters"
           error={fieldErrors.password}
           autoComplete="new-password"
         />
-
         {password.length > 0 && (
           <>
-            <div style={strengthBarTrackStyle}>
-              {[0, 1, 2, 3].map((segment) => (
+            <div style={{ display: "flex", gap: 3, height: 3, marginTop: 2 }}>
+              {[0, 1, 2, 3].map((i) => (
                 <div
-                  key={segment}
+                  key={i}
                   style={{
-                    ...strengthSegmentBaseStyle,
-                    backgroundColor:
-                      segment < strength.score
-                        ? strength.color
-                        : "rgba(255, 255, 255, 0.06)",
+                    flex: 1,
+                    height: "100%",
+                    borderRadius: 2,
+                    backgroundColor: i < strength.score ? strength.color : "rgba(255,255,255,0.05)",
+                    transition: "background-color 200ms ease",
                   }}
                 />
               ))}
             </div>
-            <span style={{ ...strengthLabelStyle, color: strength.color }}>
+            <span style={{ fontSize: 11, fontWeight: 500, color: strength.color }}>
               {strength.label}
             </span>
           </>
@@ -261,35 +163,27 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       <Input
         label="Confirm Password"
         type="password"
-        value={confirmPassword}
-        onChange={(val) => {
-          setConfirmPassword(val);
-          if (submitted) clearFieldError("confirmPassword");
-        }}
+        value={confirm}
+        onChange={(v) => { setConfirm(v); if (submitted) clearErr("confirm"); }}
         placeholder="Re-enter your password"
-        error={fieldErrors.confirmPassword}
+        error={fieldErrors.confirm}
         autoComplete="new-password"
       />
 
-      <Button
-        type="submit"
-        variant="primary"
-        size="lg"
-        loading={isLoading}
-        fullWidth
-      >
+      <Button type="submit" variant="primary" size="lg" loading={isLoading} fullWidth>
         Create Account
       </Button>
 
-      <p style={termsTextStyle}>
+      <p style={{
+        fontSize: 11,
+        color: "#4A4A56",
+        textAlign: "center",
+        lineHeight: "16px",
+      }}>
         By creating an account, you agree to our{" "}
-        <a href="#terms" style={termsLinkStyle}>
-          Terms of Service
-        </a>{" "}
-        and{" "}
-        <a href="#privacy" style={termsLinkStyle}>
-          Privacy Policy
-        </a>
+        <a href="#terms" style={{ color: "#E53935", textDecoration: "none" }}>Terms</a>
+        {" "}and{" "}
+        <a href="#privacy" style={{ color: "#E53935", textDecoration: "none" }}>Privacy Policy</a>
       </p>
     </form>
   );

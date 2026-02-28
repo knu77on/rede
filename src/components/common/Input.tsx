@@ -1,11 +1,9 @@
 // ============================================================
-// REDE - Reusable Input Component
-// macOS dark glass aesthetic
+// REDE - Input Component
+// Clean, spacious inputs with refined focus states
 // ============================================================
 
 import React from "react";
-
-// --- Types ---
 
 interface InputProps {
   label?: string;
@@ -21,54 +19,6 @@ interface InputProps {
   name?: string;
 }
 
-// --- Constants ---
-
-const FONT = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-const ACCENT = "#E53935";
-const ERROR_COLOR = "#F87171";
-
-// --- Styles ---
-
-const wrapperStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 6,
-  width: "100%",
-};
-
-const labelStyle: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 500,
-  color: "#8E8E9A",
-  fontFamily: FONT,
-  userSelect: "none",
-};
-
-const baseInputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "10px 14px",
-  fontSize: 14,
-  lineHeight: "20px",
-  fontFamily: FONT,
-  color: "#F5F5F7",
-  backgroundColor: "rgba(255, 255, 255, 0.04)",
-  border: "1px solid rgba(255, 255, 255, 0.08)",
-  borderRadius: 8,
-  outline: "none",
-  transition: "all 150ms ease",
-  boxSizing: "border-box",
-};
-
-const errorTextStyle: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 400,
-  color: ERROR_COLOR,
-  fontFamily: FONT,
-  marginTop: 2,
-};
-
-// --- Component ---
-
 export const Input: React.FC<InputProps> = ({
   label,
   value,
@@ -83,27 +33,33 @@ export const Input: React.FC<InputProps> = ({
   name,
 }) => {
   const [focused, setFocused] = React.useState(false);
-
   const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
 
-  const computedInputStyle: React.CSSProperties = {
-    ...baseInputStyle,
-    ...(focused
-      ? {
-          borderColor: error ? ERROR_COLOR : ACCENT,
-          boxShadow: error
-            ? "0 0 0 3px rgba(248, 113, 113, 0.12)"
-            : "0 0 0 3px rgba(229, 57, 53, 0.12)",
-        }
-      : {}),
-    ...(error && !focused ? { borderColor: ERROR_COLOR } : {}),
-    ...(disabled ? { opacity: 0.4, cursor: "not-allowed" } : {}),
-  };
+  const borderColor = error
+    ? "rgba(239, 68, 68, 0.5)"
+    : focused
+    ? "rgba(229, 57, 53, 0.5)"
+    : "rgba(255, 255, 255, 0.06)";
+
+  const shadow = focused
+    ? error
+      ? "0 0 0 3px rgba(239, 68, 68, 0.08)"
+      : "0 0 0 3px rgba(229, 57, 53, 0.08)"
+    : "none";
 
   return (
-    <div style={wrapperStyle}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "100%" }}>
       {label && (
-        <label htmlFor={inputId} style={labelStyle}>
+        <label
+          htmlFor={inputId}
+          style={{
+            fontSize: 12,
+            fontWeight: 500,
+            color: "#7A7A88",
+            letterSpacing: "0.01em",
+            userSelect: "none",
+          }}
+        >
           {label}
         </label>
       )}
@@ -116,12 +72,31 @@ export const Input: React.FC<InputProps> = ({
         disabled={disabled}
         autoFocus={autoFocus}
         autoComplete={autoComplete}
-        style={computedInputStyle}
+        style={{
+          width: "100%",
+          padding: "10px 14px",
+          fontSize: 13,
+          lineHeight: "18px",
+          fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+          color: "#EAEAEF",
+          backgroundColor: "rgba(255, 255, 255, 0.03)",
+          border: `1px solid ${borderColor}`,
+          borderRadius: 9,
+          outline: "none",
+          transition: "all 150ms ease",
+          boxSizing: "border-box",
+          boxShadow: shadow,
+          ...(disabled ? { opacity: 0.35, cursor: "not-allowed" } : {}),
+        }}
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
-      {error && <span style={errorTextStyle}>{error}</span>}
+      {error && (
+        <span style={{ fontSize: 11, color: "#EF4444", marginTop: 1 }}>
+          {error}
+        </span>
+      )}
     </div>
   );
 };

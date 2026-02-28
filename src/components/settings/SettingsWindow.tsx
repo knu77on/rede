@@ -1,6 +1,6 @@
 // ============================================================
 // REDE - Settings Window
-// Uses shared WindowShell with tabs in toolbar area
+// Refined tab bar with warm glass chrome
 // ============================================================
 
 import { type CSSProperties, useState, useCallback } from "react";
@@ -15,18 +15,9 @@ interface SettingsWindowProps {
   onClose?: () => void;
 }
 
-// --- Types ---
-
 type TabId = "general" | "voice" | "processing" | "privacy" | "account";
 
-interface TabDef {
-  id: TabId;
-  label: string;
-}
-
-// --- Constants ---
-
-const TABS: TabDef[] = [
+const TABS: { id: TabId; label: string }[] = [
   { id: "general", label: "General" },
   { id: "voice", label: "Voice" },
   { id: "processing", label: "Processing" },
@@ -34,23 +25,21 @@ const TABS: TabDef[] = [
   { id: "account", label: "Account" },
 ];
 
-// --- Styles ---
-
 const tabBarStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 1,
-  backgroundColor: "rgba(255, 255, 255, 0.04)",
-  borderRadius: 7,
+  backgroundColor: "rgba(255, 255, 255, 0.03)",
+  borderRadius: 8,
   padding: 2,
 };
 
-const tabStyle: CSSProperties = {
+const tabBase: CSSProperties = {
   padding: "5px 12px",
-  borderRadius: 5,
+  borderRadius: 6,
   border: "none",
   backgroundColor: "transparent",
-  color: "#6E6E7A",
+  color: "#5A5A66",
   fontSize: 11,
   fontWeight: 500,
   cursor: "pointer",
@@ -60,34 +49,19 @@ const tabStyle: CSSProperties = {
   letterSpacing: "-0.01em",
 };
 
-const tabActiveStyle: CSSProperties = {
-  backgroundColor: "rgba(255, 255, 255, 0.08)",
-  color: "#F5F5F7",
-  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.2), 0 0.5px 0 rgba(255, 255, 255, 0.04) inset",
+const tabActive: CSSProperties = {
+  backgroundColor: "rgba(255, 255, 255, 0.07)",
+  color: "#EAEAEF",
+  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.2), inset 0 0.5px 0 rgba(255, 255, 255, 0.03)",
 };
-
-const tabHoverStyle: CSSProperties = {
-  color: "#8E8E9A",
-};
-
-const contentInnerStyle: CSSProperties = {
-  width: "100%",
-  maxWidth: 540,
-  margin: "0 auto",
-  padding: "16px 28px 20px",
-};
-
-// --- Component ---
 
 export function SettingsWindow(_props: SettingsWindowProps = {}) {
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [hoveredTab, setHoveredTab] = useState<TabId | null>(null);
 
-  const handleTabClick = useCallback((tabId: TabId) => {
-    setActiveTab(tabId);
-  }, []);
+  const handleTabClick = useCallback((tabId: TabId) => setActiveTab(tabId), []);
 
-  const renderTabContent = () => {
+  const renderContent = () => {
     switch (activeTab) {
       case "general": return <GeneralTab />;
       case "voice": return <VoiceTab />;
@@ -98,18 +72,18 @@ export function SettingsWindow(_props: SettingsWindowProps = {}) {
     }
   };
 
-  const tabBarElement = (
+  const tabBar = (
     <div style={tabBarStyle}>
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
-        const isHovered = hoveredTab === tab.id && !isActive;
+        const isHov = hoveredTab === tab.id && !isActive;
         return (
           <button
             key={tab.id}
             style={{
-              ...tabStyle,
-              ...(isActive ? tabActiveStyle : {}),
-              ...(isHovered ? tabHoverStyle : {}),
+              ...tabBase,
+              ...(isActive ? tabActive : {}),
+              ...(isHov ? { color: "#7A7A88" } : {}),
             }}
             onClick={() => handleTabClick(tab.id)}
             onMouseEnter={() => setHoveredTab(tab.id)}
@@ -123,9 +97,9 @@ export function SettingsWindow(_props: SettingsWindowProps = {}) {
   );
 
   return (
-    <WindowShell title="Settings" toolbar={tabBarElement}>
-      <div style={contentInnerStyle}>
-        {renderTabContent()}
+    <WindowShell title="Settings" toolbar={tabBar}>
+      <div style={{ width: "100%", maxWidth: 540, margin: "0 auto", padding: "16px 28px 20px" }}>
+        {renderContent()}
       </div>
     </WindowShell>
   );

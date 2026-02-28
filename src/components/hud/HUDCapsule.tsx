@@ -1,12 +1,10 @@
 // ============================================================
-// REDE - HUD Capsule Container Component
-// Glassmorphic capsule with red/green glow states
+// REDE - HUD Capsule Container
+// Glassmorphic capsule with refined glow states
 // ============================================================
 
 import React from "react";
 import type { HudSize } from "../../types/index";
-
-// --- Types ---
 
 interface HUDCapsuleProps {
   size: HudSize;
@@ -16,107 +14,77 @@ interface HUDCapsuleProps {
   children: React.ReactNode;
 }
 
-// --- Dimensions ---
-// compact: circular 72x72, balanced: pill 120x72, immersive: wider pill 160x80
-
 const sizeConfig: Record<HudSize, { width: number; height: number; borderRadius: number }> = {
   compact: { width: 72, height: 72, borderRadius: 36 },
   balanced: { width: 120, height: 72, borderRadius: 36 },
   immersive: { width: 160, height: 80, borderRadius: 40 },
 };
 
-// --- Brand Colors ---
-
-const REDE_RED_RGB = "229, 57, 53";       // #E53935
-const REDE_GREEN_RGB = "76, 175, 80";     // #4CAF50
-const BORDER_IDLE = "rgba(255, 255, 255, 0.07)";
-
-// --- Keyframes ---
+const RED_RGB = "239, 68, 68";
+const GREEN_RGB = "34, 197, 94";
 
 const capsuleKeyframes = `
 @keyframes rede-glow-recording {
   0%, 100% {
-    box-shadow:
-      0 0 15px rgba(${REDE_RED_RGB}, 0.3),
-      0 0 30px rgba(${REDE_RED_RGB}, 0.15),
-      inset 0 0 15px rgba(${REDE_RED_RGB}, 0.05);
-    border-color: rgba(${REDE_RED_RGB}, 0.5);
+    box-shadow: 0 0 15px rgba(${RED_RGB}, 0.25), 0 0 30px rgba(${RED_RGB}, 0.12), inset 0 0 12px rgba(${RED_RGB}, 0.04);
+    border-color: rgba(${RED_RGB}, 0.4);
   }
   50% {
-    box-shadow:
-      0 0 25px rgba(${REDE_RED_RGB}, 0.5),
-      0 0 50px rgba(${REDE_RED_RGB}, 0.25),
-      inset 0 0 20px rgba(${REDE_RED_RGB}, 0.08);
-    border-color: rgba(${REDE_RED_RGB}, 0.7);
+    box-shadow: 0 0 25px rgba(${RED_RGB}, 0.4), 0 0 50px rgba(${RED_RGB}, 0.2), inset 0 0 18px rgba(${RED_RGB}, 0.06);
+    border-color: rgba(${RED_RGB}, 0.6);
   }
 }
-
 @keyframes rede-glow-processing {
   0%, 100% {
-    box-shadow:
-      0 0 15px rgba(${REDE_GREEN_RGB}, 0.3),
-      0 0 30px rgba(${REDE_GREEN_RGB}, 0.15),
-      inset 0 0 15px rgba(${REDE_GREEN_RGB}, 0.05);
-    border-color: rgba(${REDE_GREEN_RGB}, 0.5);
+    box-shadow: 0 0 15px rgba(${GREEN_RGB}, 0.25), 0 0 30px rgba(${GREEN_RGB}, 0.12), inset 0 0 12px rgba(${GREEN_RGB}, 0.04);
+    border-color: rgba(${GREEN_RGB}, 0.4);
   }
   50% {
-    box-shadow:
-      0 0 25px rgba(${REDE_GREEN_RGB}, 0.5),
-      0 0 50px rgba(${REDE_GREEN_RGB}, 0.25),
-      inset 0 0 20px rgba(${REDE_GREEN_RGB}, 0.08);
-    border-color: rgba(${REDE_GREEN_RGB}, 0.7);
+    box-shadow: 0 0 25px rgba(${GREEN_RGB}, 0.4), 0 0 50px rgba(${GREEN_RGB}, 0.2), inset 0 0 18px rgba(${GREEN_RGB}, 0.06);
+    border-color: rgba(${GREEN_RGB}, 0.6);
   }
 }
 `;
 
-// --- Component ---
-
-export const HUDCapsule: React.FC<HUDCapsuleProps> = ({
-  size,
-  isRecording,
-  isProcessing,
-  showGlow,
-  children,
-}) => {
-  const config = sizeConfig[size];
+export const HUDCapsule: React.FC<HUDCapsuleProps> = ({ size, isRecording, isProcessing, showGlow, children }) => {
+  const cfg = sizeConfig[size];
   const glowActive = showGlow && (isRecording || isProcessing);
 
   const borderColor = isRecording
-    ? `rgba(${REDE_RED_RGB}, 0.5)`
+    ? `rgba(${RED_RGB}, 0.4)`
     : isProcessing
-      ? `rgba(${REDE_GREEN_RGB}, 0.5)`
-      : BORDER_IDLE;
-
-  const capsuleStyle: React.CSSProperties = {
-    width: config.width,
-    height: config.height,
-    borderRadius: config.borderRadius,
-    backgroundColor: "rgba(12, 12, 16, 0.88)",
-    backdropFilter: "blur(24px)",
-    WebkitBackdropFilter: "blur(24px)",
-    border: `1.5px solid ${borderColor}`,
-    boxShadow: glowActive
-      ? undefined // animation takes over box-shadow
-      : "0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    boxSizing: "border-box",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    transition: "width 300ms ease, height 300ms ease, border-radius 300ms ease, border-color 300ms ease, box-shadow 300ms ease",
-    animation: glowActive
-      ? isRecording
-        ? "rede-glow-recording 2s ease-in-out infinite"
-        : "rede-glow-processing 1.5s ease-in-out infinite"
-      : "none",
-    position: "relative",
-  };
+    ? `rgba(${GREEN_RGB}, 0.4)`
+    : "rgba(255, 255, 255, 0.06)";
 
   return (
     <>
       <style>{capsuleKeyframes}</style>
-      <div style={capsuleStyle} role="status" aria-live="polite">
+      <div
+        style={{
+          width: cfg.width,
+          height: cfg.height,
+          borderRadius: cfg.borderRadius,
+          backgroundColor: "rgba(9, 9, 15, 0.9)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          border: `1.5px solid ${borderColor}`,
+          boxShadow: glowActive ? undefined : "0 4px 24px rgba(0, 0, 0, 0.45), 0 1px 4px rgba(0, 0, 0, 0.2)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+          boxSizing: "border-box",
+          transition: "width 300ms ease, height 300ms ease, border-radius 300ms ease, border-color 300ms ease, box-shadow 300ms ease",
+          animation: glowActive
+            ? isRecording
+              ? "rede-glow-recording 2s ease-in-out infinite"
+              : "rede-glow-processing 1.5s ease-in-out infinite"
+            : "none",
+          position: "relative",
+        }}
+        role="status"
+        aria-live="polite"
+      >
         {children}
       </div>
     </>
